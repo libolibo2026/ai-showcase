@@ -6,148 +6,187 @@
     <title>AI橱窗 - 发现好用的AI工具与作品</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
+        /* ================= 核心色彩系统 (统一青绿色相) ================= */
         :root {
-            --bg-gradient: linear-gradient(180deg, #E2E7D3 0%, #F2F5EA 100%);
-            --bg-base: #ffffff;
-            --nav-bg: rgba(255, 255, 255, 0.75);
-            --nav-border: rgba(0, 0, 0, 0.05);
-            --sec-1-bg: rgba(255, 255, 255, 0.85); 
-            --sec-2-bg: rgba(255, 255, 255, 0.6); 
-            --sec-3-bg: rgba(255, 255, 255, 0.4); 
-            --text-main: #2b3623; 
-            --text-sub: rgba(43, 54, 35, 0.65);
-            --hero-bg: linear-gradient(135deg, #ffffff 0%, #f4f6ec 100%);
-            --hero-border: #dbe0c8;
-            --hero-shadow: 0 10px 25px -5px rgba(43, 54, 35, 0.05);
-            --card-bg: rgba(255, 255, 255, 0.7);
-            --item-bg: #ffffff;
-            --border-color: rgba(0, 0, 0, 0.06);
-            --accent: #bd9034; 
-            --accent-text: #ffffff;
-            --accent-gradient: linear-gradient(135deg, #cda347 0%, #bd9034 100%);
-            --logo-bg: #2b3623;
-            --logo-text: #ffffff;
-            --toggle-bg: rgba(0,0,0,0.05);
-            --toggle-active-bg: #ffffff;
-            --toggle-active-text: #2b3623;
-            --toggle-active-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            /* ☀️ 白天模式：极简通透、晨雾灰绿 */
+            --bg-base: #E9EFEB;
+            --bg-gradient: linear-gradient(180deg, #E9EFEB 0%, #F4F7F5 100%);
+            --nav-bg: rgba(244, 247, 245, 0.85);
             
-            /* 页脚专属颜色 */
-            --footer-logo-bg: #77b99a;
-            --footer-logo-text: #011A17;
+            --text-main: #1A2B23;
+            --text-sub: #5E7568;
+            --text-inverse: #FFFFFF;
+            
+            --card-bg: #FFFFFF;
+            --border-color: rgba(26, 43, 35, 0.08);
+            --hover-shadow: 0 8px 24px -8px rgba(26, 43, 35, 0.1);
+            
+            --accent: #4C7A64;
+            --accent-hover: #3B614F;
+            
+            --toggle-bg: rgba(26, 43, 35, 0.06);
+            --toggle-active-bg: #FFFFFF;
+            
+            --tooltip-bg: #1A2B23;
+            --tooltip-text: #FFFFFF;
         }
+
         [data-theme="dark"] {
-            --bg-gradient: linear-gradient(180deg, #011A17 0%, #012D28 100%);
-            --bg-base: #011A17;
-            --nav-bg: rgba(1, 26, 23, 0.85);
-            --nav-border: rgba(255, 255, 255, 0.05);
-            --sec-1-bg: rgba(37, 116, 91, 0.15); 
-            --sec-2-bg: rgba(37, 116, 91, 0.1); 
-            --sec-3-bg: rgba(37, 116, 91, 0.05); 
-            --text-main: #77b99a; 
-            --text-sub: rgba(119, 185, 154, 0.6);
-            --hero-bg: linear-gradient(135deg, rgba(37, 116, 91, 0.2) 0%, rgba(1, 38, 32, 0.4) 100%);
-            --hero-border: rgba(119, 185, 154, 0.2);
-            --hero-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
-            --card-bg: rgba(37, 116, 91, 0.15);
-            --item-bg: rgba(37, 116, 91, 0.2);
-            --border-color: rgba(119, 185, 154, 0.1);
-            --accent: #77b99a;
-            --accent-text: #013630;
-            --accent-gradient: linear-gradient(135deg, #8bccaf 0%, #77b99a 100%);
-            --logo-bg: #77b99a;
-            --logo-text: #013630;
-            --toggle-bg: rgba(0,0,0,0.3);
-            --toggle-active-bg: rgba(119, 185, 154, 0.2);
-            --toggle-active-text: #77b99a;
-            --toggle-active-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            /* 🌙 夜晚模式：极夜深空、静谧黑绿 */
+            --bg-base: #0A100D;
+            --bg-gradient: linear-gradient(180deg, #0A100D 0%, #111A16 100%);
+            --nav-bg: rgba(10, 16, 13, 0.85);
             
-            --footer-logo-bg: #77b99a;
-            --footer-logo-text: #011A17;
+            --text-main: #B8D4C6;
+            --text-sub: #769985;
+            --text-inverse: #0A100D;
+            
+            --card-bg: #131F19;
+            --border-color: rgba(184, 212, 198, 0.1);
+            --hover-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
+            
+            --accent: #638F78;
+            --accent-hover: #7AA88E;
+            
+            --toggle-bg: rgba(184, 212, 198, 0.05);
+            --toggle-active-bg: #1E3126;
+            
+            --tooltip-bg: #B8D4C6;
+            --tooltip-text: #0A100D;
         }
+
         [data-theme="eye"] {
-            --bg-gradient: linear-gradient(180deg, #DFE3C8 0%, #EAEDD9 100%);
-            --bg-base: #3d4411;
-            --nav-bg: rgba(234, 237, 217, 0.85);
-            --nav-border: rgba(0, 0, 0, 0.05);
-            --sec-1-bg: rgba(255, 255, 255, 0.55); 
-            --sec-2-bg: rgba(255, 255, 255, 0.45); 
-            --sec-3-bg: rgba(255, 255, 255, 0.35); 
-            --text-main: #3d4411; 
-            --text-sub: rgba(61, 68, 17, 0.65);
-            --hero-bg: linear-gradient(135deg, rgba(255,255,255,0.8) 0%, rgba(230, 235, 200, 0.8) 100%);
-            --hero-border: rgba(142, 150, 77, 0.3);
-            --hero-shadow: 0 10px 25px -5px rgba(61, 68, 17, 0.05);
-            --card-bg: rgba(255, 255, 255, 0.55);
-            --item-bg: rgba(255, 255, 255, 0.75);
-            --border-color: rgba(0, 0, 0, 0.06);
-            --accent: #8e964d;
-            --accent-text: #ffffff;
-            --accent-gradient: linear-gradient(135deg, #9ea65a 0%, #8e964d 100%);
-            --logo-bg: #3d4411;
-            --logo-text: #ffffff;
-            --toggle-bg: rgba(0,0,0,0.06);
-            --toggle-active-bg: rgba(255,255,255,0.7);
-            --toggle-active-text: #3d4411;
-            --toggle-active-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            /* 👁️ 护眼模式：纸张暖阳、枯叶灰绿 */
+            --bg-base: #DCDED1;
+            --bg-gradient: linear-gradient(180deg, #DCDED1 0%, #EAECE3 100%);
+            --nav-bg: rgba(234, 236, 227, 0.85);
             
-            --footer-logo-bg: #5a7d46;
-            --footer-logo-text: #ffffff;
+            --text-main: #2F3629;
+            --text-sub: #68705F;
+            --text-inverse: #FFFFFF;
+            
+            --card-bg: #F3F5EF;
+            --border-color: rgba(47, 54, 41, 0.08);
+            --hover-shadow: 0 8px 24px -8px rgba(47, 54, 41, 0.1);
+            
+            --accent: #657755;
+            --accent-hover: #526144;
+            
+            --toggle-bg: rgba(47, 54, 41, 0.06);
+            --toggle-active-bg: #F3F5EF;
+            
+            --tooltip-bg: #2F3629;
+            --tooltip-text: #FFFFFF;
         }
+
+        /* ================= 基础样式 ================= */
         body {
             background: var(--bg-gradient);
             background-attachment: fixed;
             color: var(--text-main);
-            transition: background 0.5s ease, color 0.3s ease;
-            font-family: system-ui, -apple-system, sans-serif;
+            transition: background 0.4s ease, color 0.4s ease;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
+            -webkit-font-smoothing: antialiased;
         }
+
         .glass-nav {
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            background-color: var(--nav-bg);
-            border-bottom: 1px solid var(--nav-border);
-            color: var(--text-main);
-        }
-        .logo-box {
-            background-color: var(--logo-bg);
-            color: var(--logo-text); 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-            transition: all 0.3s ease;
-        }
-        .search-box {
-            background-color: var(--item-bg);
-            border: 1px solid var(--border-color);
-            color: var(--text-main);
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
-        }
-        .search-box::placeholder { color: var(--text-sub); }
-        .section-box {
-            border-radius: 24px;
-            box-shadow: 0 8px 30px -10px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.4);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            padding: 1.25rem 1rem;
-            border: 1px solid var(--border-color);
-            transition: background 0.3s ease;
+            background-color: var(--nav-bg);
+            border-bottom: 1px solid var(--border-color);
         }
-        .section-1 { background: var(--sec-1-bg); }
-        .section-2 { background: var(--sec-2-bg); }
-        .section-3 { background: var(--sec-3-bg); }
-        .title-bold { font-weight: 900; letter-spacing: -0.02em; }
-        .theme-segment { background-color: var(--toggle-bg); border-radius: 20px; padding: 3px; display: flex; gap: 2px; }
-        .theme-btn { width: 32px; height: 26px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.25s ease; opacity: 0.6; filter: grayscale(1); }
-        .theme-btn.active { background-color: var(--toggle-active-bg); color: var(--toggle-active-text); box-shadow: var(--toggle-active-shadow); opacity: 1; filter: grayscale(0); transform: scale(1.05); }
-        .hover-lift { transition: transform 0.2s ease, box-shadow 0.2s ease; }
-        .hover-lift:hover { transform: translateY(-2px); box-shadow: 0 8px 20px -6px rgba(0,0,0,0.1) !important; }
-        .hover-lift:active { transform: scale(0.97); }
-        .btn-primary { background: var(--accent-gradient); color: var(--accent-text); box-shadow: 0 4px 15px -3px rgba(189, 144, 52, 0.4); transition: all 0.2s ease; }
-        .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+        
+        .logo-box {
+            background-color: var(--text-main);
+            color: var(--bg-base); 
+            font-weight: 800;
+            transition: all 0.3s ease;
+        }
 
-        /* 悬停气泡 (Tooltip) - IE 兼容暴力修复版 */
+        .search-box {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            transition: all 0.2s ease;
+        }
+        .search-box:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(76, 122, 100, 0.2);
+        }
+        .search-box::placeholder { color: var(--text-sub); }
+
+        .section-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            box-shadow: 0 4px 20px -10px rgba(0,0,0,0.02);
+        }
+
+        .item-card {
+            background-color: transparent;
+            border: 1px solid transparent;
+            border-radius: 16px;
+            transition: all 0.2s ease;
+        }
+        .item-card:hover {
+            background-color: var(--bg-base);
+            border-color: var(--border-color);
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .btn-primary {
+            background-color: var(--accent);
+            color: var(--text-inverse);
+            border: 1px solid transparent;
+            transition: all 0.2s ease;
+        }
+        .btn-primary:hover { background-color: var(--accent-hover); }
+        .btn-primary:active { transform: scale(0.98); }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            transition: all 0.2s ease;
+        }
+        .btn-secondary:hover { background-color: var(--toggle-bg); }
+        .btn-secondary:active { transform: scale(0.98); }
+
+        /* ================= 极简主题切换器 ================= */
+        .theme-switch {
+            display: flex;
+            background-color: var(--toggle-bg);
+            border-radius: 12px;
+            padding: 3px;
+            border: 1px solid var(--border-color);
+        }
+        .theme-btn {
+            width: 32px;
+            height: 28px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-sub);
+            transition: all 0.25s ease;
+            cursor: pointer;
+        }
+        .theme-btn:hover { color: var(--text-main); }
+        .theme-btn.active {
+            background-color: var(--toggle-active-bg);
+            color: var(--text-main);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+        [data-theme="dark"] .theme-btn.active {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        /* ================= Tooltip 气泡 ================= */
         .tooltip-container { position: relative; }
         .tooltip-text {
             visibility: hidden;
@@ -155,22 +194,22 @@
             position: absolute;
             bottom: 100%;
             left: 50%;
-            transform: translateX(-50%) translateY(5px);
-            background-color: #2b3623;
-            color: #ffffff;
+            transform: translateX(-50%) translateY(8px);
+            background-color: var(--tooltip-bg);
+            color: var(--tooltip-text);
             text-align: center;
-            padding: 8px 12px;
+            padding: 8px 14px;
             border-radius: 8px;
             font-size: 12px;
-            line-height: 1.4;
+            font-weight: 500;
+            line-height: 1.5;
             white-space: normal;
             width: max-content;
-            max-width: 220px;
+            max-width: 240px;
             z-index: 50;
-            transition: opacity 0.2s, transform 0.2s;
+            transition: opacity 0.2s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             pointer-events: none;
-            margin-bottom: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2);
         }
         .tooltip-text::after {
             content: "";
@@ -180,7 +219,7 @@
             margin-left: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: #2b3623 transparent transparent transparent;
+            border-color: var(--tooltip-bg) transparent transparent transparent;
         }
         .tooltip-container:hover .tooltip-text {
             visibility: visible;
@@ -191,86 +230,90 @@
 </head>
 <body class="pb-24">
 
+    <!-- 顶部导航 -->
     <header class="sticky top-0 z-50 glass-nav">
-        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-3">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
-                <div class="w-9 h-9 rounded-xl flex items-center justify-center font-black text-lg logo-box">AI</div>
-                <h1 class="text-xl title-bold hidden sm:block">AI橱窗</h1>
+                <div class="w-9 h-9 rounded-xl flex items-center justify-center text-lg logo-box">AI</div>
+                <h1 class="text-xl font-bold tracking-tight hidden sm:block">AI橱窗</h1>
             </div>
+            
             <div class="relative flex-1 max-w-[280px] sm:max-w-md">
-                <span class="absolute left-4 top-1/2 -translate-y-1/2 text-sm opacity-50">🔍</span>
-                <input type="text" id="searchInput" placeholder="搜索工具、网站..." class="search-box w-full pl-10 pr-4 py-2 rounded-full text-sm focus:outline-none transition-colors">
+                <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" placeholder="搜索工具或网站..." class="search-box w-full pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none">
             </div>
-            <div class="theme-segment flex-shrink-0">
-                <button onclick="setTheme('light', this)" class="theme-btn active">☀️</button>
-                <button onclick="setTheme('dark', this)" class="theme-btn">🌙</button>
-                <button onclick="setTheme('eye', this)" class="theme-btn">👓</button>
+
+            <!-- 极简 SVG 主题切换 -->
+            <div class="theme-switch flex-shrink-0">
+                <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                </button>
+                <button onclick="setTheme('dark', this)" class="theme-btn" title="夜晚模式">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+                <button onclick="setTheme('eye', this)" class="theme-btn" title="护眼模式">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                </button>
             </div>
         </div>
     </header>
 
-    <!-- 主体内容添加 flex-grow 确保页脚沉底 -->
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 space-y-8">
-        <!-- 板块 1：我的实验室 -->
-        <section class="section-box section-1 !p-4 sm:!p-6">
-            <div class="relative rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center border" style="background: var(--hero-bg); border-color: var(--hero-border); box-shadow: var(--hero-shadow);">
-                <!-- 左侧文字区 -->
-                <div class="relative z-10 w-full md:w-5/12 flex flex-col justify-center">
-                    <div class="mb-2">
-                        <span class="inline-block px-3 py-1 border text-xs font-bold rounded-full tracking-widest" style="border-color: var(--accent); color: var(--accent);">站长作品</span>
-                    </div>
-                    <h2 class="text-3xl sm:text-4xl title-bold mb-3 leading-tight" style="color: var(--text-main);">我的 AI 独立实验室</h2>
-                    <p class="text-sm leading-relaxed font-medium mb-6" style="color: var(--text-sub);">
-                        纯手工打造，专为寻找好工具的你。这里不仅收录免注册神器，也是大家展示创意的角落。
+    <!-- 主体内容 -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 space-y-6">
+        
+        <!-- 站长作品区 -->
+        <section class="section-card p-6 sm:p-10">
+            <div class="flex flex-col md:flex-row gap-10 items-center">
+                <div class="w-full md:w-5/12 flex flex-col justify-center">
+                    <span class="text-xs font-bold tracking-wider uppercase mb-3" style="color: var(--accent);">站长作品</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4 leading-tight tracking-tight">我的 AI 独立实验室</h2>
+                    <p class="text-sm leading-relaxed mb-8" style="color: var(--text-sub);">
+                        纯手工打造，专为寻找好工具的你。收录免注册神器，也是大家展示创意的角落。
                     </p>
-                    <div class="flex gap-4">
-                        <a href="https://mindfeed2.pages.dev/" target="_blank" class="btn-primary px-6 py-3 rounded-xl font-bold text-sm flex-1 sm:flex-none text-center flex items-center justify-center gap-2">
+                    <div class="flex gap-3">
+                        <a href="https://mindfeed2.pages.dev/" target="_blank" class="btn-primary px-6 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-1">
                             访问主站 <span class="text-lg leading-none">↗</span>
                         </a>
-                        <button onclick="openSubmitModal()" class="px-6 py-3 rounded-xl font-bold text-sm border transition-colors active:scale-95 flex-1 sm:flex-none" style="border-color: var(--border-color); color: var(--text-main); background: transparent;">
+                        <button onclick="openSubmitModal()" class="btn-secondary px-6 py-2.5 rounded-xl font-bold text-sm">
                             提交作品
                         </button>
                     </div>
                 </div>
-                <!-- 右侧作品展示网格 -->
-                <div class="relative z-10 w-full md:w-7/12 rounded-xl overflow-hidden flex flex-col">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="myWorksGrid">
-                        <div class="text-center py-10 opacity-50 w-full col-span-full">加载中...</div>
+                <!-- 我的作品网格 -->
+                <div class="w-full md:w-7/12">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="myWorksGrid">
+                        <div class="text-center py-10 opacity-50 text-sm w-full col-span-full">加载数据中...</div>
                     </div>
                 </div>
             </div>
         </section>
 
         <!-- 下半部分双列 -->
-        <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
-            <!-- 板块 2：AI 脑洞橱窗 -->
-            <div class="md:col-span-5 md:order-last space-y-6">
-                <section class="section-box section-2 h-full">
-                    <div class="flex items-center gap-2 mb-4 px-1">
-                        <span class="text-2xl">🧸</span>
-                        <div>
-                            <h2 class="text-xl title-bold">AI 脑洞橱窗</h2>
-                            <p class="text-xs font-medium opacity-70">网友用 AI 搞出的创意</p>
-                        </div>
+        <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
+            
+            <!-- AI 脑洞橱窗 -->
+            <div class="md:col-span-5 md:order-last">
+                <section class="section-card p-5 h-full">
+                    <div class="mb-5">
+                        <h2 class="text-lg font-bold">AI 脑洞橱窗</h2>
+                        <p class="text-xs mt-1" style="color: var(--text-sub);">网友用 AI 搞出的创意</p>
                     </div>
-                    <div class="grid grid-cols-1 gap-4" id="showcaseGrid">
+                    <div class="space-y-3" id="showcaseGrid">
                         <!-- JS 渲染 -->
                     </div>
                 </section>
             </div>
 
-            <!-- 板块 3：常用工具收藏夹（彻底打平，无分类） -->
-            <div class="md:col-span-7 space-y-6">
-                <section class="section-box section-3 h-full">
-                    <div class="flex items-center gap-2 mb-4 px-1">
-                        <span class="text-2xl">📂</span>
+            <!-- 常用工具收藏夹 -->
+            <div class="md:col-span-7">
+                <section class="section-card p-5 h-full">
+                    <div class="mb-5 flex justify-between items-end">
                         <div>
-                            <h2 class="text-xl title-bold">常用工具收藏夹</h2>
-                            <p class="text-xs font-medium opacity-70">鼠标悬停可查看完整介绍</p>
+                            <h2 class="text-lg font-bold">常用工具收藏夹</h2>
+                            <p class="text-xs mt-1" style="color: var(--text-sub);">点击直达，悬停查看简介</p>
                         </div>
                     </div>
-                    <!-- 直接铺满的工具网格 -->
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="toolsGrid">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="toolsGrid">
                         <!-- JS 渲染 -->
                     </div>
                 </section>
@@ -278,74 +321,72 @@
         </div>
     </main>
 
-    <!-- ================= 页脚 (Footer) ================= -->
-    <footer class="w-full py-10 mt-6 border-t" style="border-color: var(--border-color);">
+    <!-- 页脚 -->
+    <footer class="w-full py-10 mt-auto border-t" style="border-color: var(--border-color);">
         <div class="max-w-6xl mx-auto px-4 flex flex-col items-center justify-center gap-3">
             <div class="flex items-center gap-2">
-                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-sm" style="background-color: var(--footer-logo-bg); color: var(--footer-logo-text);">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-xs bg-emerald-600 text-white shadow-sm">
                     方
                 </div>
-                <span class="text-base font-bold tracking-wide" style="color: var(--text-main);">方塘 Mindfeed</span>
+                <span class="text-sm font-bold tracking-wide">方塘 Mindfeed</span>
             </div>
-            <p class="text-xs font-medium opacity-60" style="color: var(--text-sub);">
+            <p class="text-xs font-medium opacity-60">
                 &copy; <span id="currentYear">2026</span> 方塘 Mindfeed. 保留所有权利。
             </p>
         </div>
     </footer>
 
+    <!-- 悬浮提交按钮 -->
     <div class="fixed bottom-8 right-8 z-40">
-        <button onclick="openSubmitModal()" class="btn-primary w-16 h-16 rounded-full flex items-center justify-center">
-            <span class="text-3xl font-light">＋</span>
+        <button onclick="openSubmitModal()" class="btn-primary w-14 h-14 rounded-full flex items-center justify-center shadow-lg">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
         </button>
     </div>
 
     <!-- 提交弹窗 -->
-    <div id="submitModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[100] p-4 backdrop-blur-md">
-        <div class="rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border" style="background: var(--sec-1-bg); color: var(--text-main); border-color: var(--border-color); backdrop-filter: blur(20px);">
+    <div id="submitModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[100] p-4 backdrop-blur-sm">
+        <div class="rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl border" style="background: var(--card-bg); border-color: var(--border-color);">
             <div class="px-6 py-5 border-b flex justify-between items-center" style="border-color: var(--border-color);">
-                <h3 class="font-bold text-xl title-bold">✨ 分享你的 AI 作品</h3>
-                <button onclick="closeSubmitModal()" class="text-3xl leading-none opacity-50 hover:opacity-100 transition-opacity">&times;</button>
+                <h3 class="font-bold text-lg">✨ 分享你的 AI 作品</h3>
+                <button onclick="closeSubmitModal()" class="text-2xl leading-none opacity-50 hover:opacity-100 transition-opacity">&times;</button>
             </div>
-            <form onsubmit="handleSubmit(event)" class="p-6 space-y-5">
+            <form onsubmit="handleSubmit(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-bold mb-2">网站名称</label>
-                    <input type="text" required class="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style="background: var(--item-bg); color: var(--text-main); border-color: var(--border-color);" placeholder="给你的网站起个名字">
+                    <input type="text" required class="w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="给你的网站起个名字">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2">网站地址 (URL)</label>
-                    <input type="url" required class="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style="background: var(--item-bg); color: var(--text-main); border-color: var(--border-color);" placeholder="https://...">
+                    <input type="url" required class="w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="https://...">
                 </div>
                 <div>
                     <label class="block text-sm font-bold mb-2">一句话简介</label>
-                    <textarea required rows="3" class="w-full px-4 py-3 rounded-xl text-sm border focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" style="background: var(--item-bg); color: var(--text-main); border-color: var(--border-color);" placeholder="用一句话介绍它的特色..."></textarea>
+                    <textarea required rows="3" class="w-full px-4 py-2.5 rounded-xl text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="用一句话介绍它的特色..."></textarea>
                 </div>
-                <button type="submit" class="btn-primary w-full py-3.5 rounded-xl font-bold text-base mt-2">确认提交</button>
+                <button type="submit" class="btn-primary w-full py-3 rounded-xl font-bold text-base mt-2">确认提交</button>
             </form>
         </div>
     </div>
 
     <script>
-        // 动态获取当前年份，自动更新版权信息
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // 主题控制
         function setTheme(theme, btn) {
             document.documentElement.setAttribute('data-theme', theme);
             document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
-            localStorage.setItem('ai-chuangkou-theme', theme);
+            localStorage.setItem('ai-showcase-theme', theme);
         }
-        const savedTheme = localStorage.getItem('ai-chuangkou-theme') || 'light';
+        
+        const savedTheme = localStorage.getItem('ai-showcase-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTimeout(() => {
-            document.querySelectorAll('.theme-btn').forEach(b => {
-                if(savedTheme === 'light' && b.innerHTML === '☀️') b.classList.add('active');
-                if(savedTheme === 'dark' && b.innerHTML === '🌙') b.classList.add('active');
-                if(savedTheme === 'eye' && b.innerHTML === '👓') b.classList.add('active');
-            });
+            const btns = document.querySelectorAll('.theme-btn');
+            if (savedTheme === 'light') btns[0]?.classList.add('active');
+            if (savedTheme === 'dark') btns[1]?.classList.add('active');
+            if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
-        // 获取并渲染我的作品
         async function fetchWorks() {
             try {
                 const res = await fetch('/api/works');
@@ -354,46 +395,55 @@
                 
                 const grid = document.getElementById('myWorksGrid');
                 grid.innerHTML = json.data.map(item => `
-                    <div class="hover-lift p-4 flex flex-col justify-center cursor-pointer rounded-2xl border shadow-sm backdrop-blur-sm h-full" 
-                         style="background-color: var(--card-bg); border-color: var(--border-color); color: var(--text-main);"
-                         onclick="window.open('${item.url}', '_blank')">
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xl flex-shrink-0 bg-black/5">
-                                ${item.icon}
-                            </div>
-                            <h3 class="text-base font-bold truncate">${item.name}</h3>
+                    <div class="item-card p-4 cursor-pointer flex flex-col justify-center" onclick="window.open('${item.url}', '_blank')">
+                        <div class="flex items-center gap-3 mb-1">
+                            <div class="text-xl flex-shrink-0">${item.icon}</div>
+                            <h3 class="text-sm font-bold truncate">${item.name}</h3>
                         </div>
-                        <p class="text-xs line-clamp-2 leading-relaxed opacity-70">${item.description}</p>
+                        <p class="text-xs line-clamp-1" style="color: var(--text-sub);">${item.description}</p>
                     </div>
                 `).join('');
             } catch (e) { 
                 console.error('获取作品失败', e);
-                document.getElementById('myWorksGrid').innerHTML = `<div class="text-center py-10 opacity-50 w-full col-span-full">暂无作品数据</div>`;
+                document.getElementById('myWorksGrid').innerHTML = `<div class="text-center py-10 opacity-50 text-sm w-full col-span-full">暂无作品数据</div>`;
             }
         }
 
-        // 获取并渲染 AI 脑洞
         async function fetchIdeas() {
             try {
                 const res = await fetch('/api/ideas');
                 const json = await res.json();
-                if (!json.success) return;
+                
                 const grid = document.getElementById('showcaseGrid');
-                grid.innerHTML = json.data.map(item => `
-                    <div class="hover-lift p-4 flex flex-col sm:flex-row gap-4 cursor-pointer rounded-2xl border shadow-sm backdrop-blur-sm" 
-                         style="background-color: var(--card-bg); border-color: var(--border-color); color: var(--text-main);"
-                         onclick="window.open('${item.url}', '_blank')">
-                        <div class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl flex-shrink-0 bg-black/5">${item.icon}</div>
-                        <div class="flex-1 min-w-0 flex flex-col justify-center">
-                            <h3 class="text-base font-bold truncate">${item.name}</h3>
-                            <p class="text-xs mt-1.5 line-clamp-2 leading-relaxed opacity-70">${item.description}</p>
+                let html = '';
+                
+                if (json.success && json.data.length > 0) {
+                    html = json.data.map(item => `
+                        <div class="item-card p-3 flex gap-3 cursor-pointer" onclick="window.open('${item.url}', '_blank')">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style="background: var(--bg-base);">${item.icon}</div>
+                            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-sub);">${item.description}</p>
+                            </div>
                         </div>
+                    `).join('');
+                }
+                
+                // 追加“欢迎录入”卡片
+                html += `
+                    <div class="mt-4 p-4 rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
+                         style="border-color: var(--border-color);" onclick="openSubmitModal()">
+                        <div class="w-8 h-8 rounded-full flex items-center justify-center mb-2" style="background: var(--bg-base); color: var(--accent);">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                        </div>
+                        <span class="text-sm font-bold" style="color: var(--accent);">欢迎录入您的作品</span>
                     </div>
-                `).join('');
+                `;
+                
+                grid.innerHTML = html;
             } catch (e) { console.error('获取脑洞失败', e); }
         }
 
-        // 获取并渲染工具收藏夹
         async function fetchTools() {
             try {
                 const res = await fetch('/api/tools');
@@ -407,27 +457,23 @@
 
                 const container = document.getElementById('toolsGrid');
                 if (allTools.length === 0) {
-                    container.innerHTML = `<div class="text-center py-10 opacity-50 w-full col-span-full">暂无工具数据</div>`;
+                    container.innerHTML = `<div class="text-center py-10 opacity-50 text-sm w-full col-span-full">暂无工具数据</div>`;
                     return;
                 }
 
                 container.innerHTML = allTools.map(tool => `
-                    <div class="hover-lift tooltip-container p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm relative" 
-                         style="background-color: var(--item-bg); border-color: var(--border-color); color: var(--text-main);"
-                         onclick="window.open('${tool.url}', '_blank')">
-                        <div class="text-2xl flex-shrink-0">${tool.icon}</div>
-                        <div class="flex-1 min-w-0">
+                    <div class="item-card tooltip-container p-3 flex flex-col justify-center cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
+                        <div class="flex items-center gap-2 mb-1.5">
+                            <div class="text-lg flex-shrink-0">${tool.icon}</div>
                             <div class="text-sm font-bold truncate">${tool.name}</div>
-                            <div class="text-[11px] truncate mt-0.5 opacity-60">${tool.description}</div>
                         </div>
-                        <!-- 悬停显示完整简介 -->
+                        <div class="text-[11px] truncate" style="color: var(--text-sub);">${tool.description}</div>
                         <div class="tooltip-text">${tool.description}</div>
                     </div>
                 `).join('');
             } catch (e) { console.error('获取工具失败', e); }
         }
 
-        // 弹窗控制
         function openSubmitModal() {
             document.getElementById('submitModal').classList.remove('hidden');
             document.getElementById('submitModal').classList.add('flex');
@@ -437,7 +483,6 @@
             document.getElementById('submitModal').classList.remove('flex');
         }
 
-        // 提交表单
         async function handleSubmit(e) {
             e.preventDefault();
             const form = e.target;
@@ -461,7 +506,6 @@
             }
         }
 
-        // 页面加载完成后拉取数据
         document.addEventListener('DOMContentLoaded', () => {
             fetchWorks();
             fetchIdeas();
