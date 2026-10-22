@@ -123,9 +123,6 @@
         .section-2 { background: var(--sec-2-bg); }
         .section-3 { background: var(--sec-3-bg); }
         .title-bold { font-weight: 900; letter-spacing: -0.02em; }
-        .accordion-content { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.35s cubic-bezier(0.4, 0, 0.2, 1); }
-        .accordion-content.open { grid-template-rows: 1fr; }
-        .accordion-inner { overflow: hidden; }
         .theme-segment { background-color: var(--toggle-bg); border-radius: 20px; padding: 3px; display: flex; gap: 2px; }
         .theme-btn { width: 32px; height: 26px; border-radius: 16px; display: flex; align-items: center; justify-content: center; font-size: 14px; transition: all 0.25s ease; opacity: 0.6; filter: grayscale(1); }
         .theme-btn.active { background-color: var(--toggle-active-bg); color: var(--toggle-active-text); box-shadow: var(--toggle-active-shadow); opacity: 1; filter: grayscale(0); transform: scale(1.05); }
@@ -209,17 +206,18 @@
                 </section>
             </div>
 
-            <!-- 板块 3：常用工具收藏夹 -->
+            <!-- 板块 3：常用工具收藏夹（改为平铺直接展示） -->
             <div class="md:col-span-7 space-y-6">
                 <section class="section-box section-3 h-full">
                     <div class="flex items-center gap-2 mb-4 px-1">
                         <span class="text-2xl">📂</span>
                         <div>
                             <h2 class="text-xl title-bold">常用工具收藏夹</h2>
-                            <p class="text-xs font-medium opacity-70">点击展开，直观查看简介</p>
+                            <p class="text-xs font-medium opacity-70">点击图标直达，方便快捷</p>
                         </div>
                     </div>
-                    <div class="space-y-4" id="bookmarkFolders">
+                    <!-- 这里不再使用手风琴，直接展示网格 -->
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="toolsGrid">
                         <!-- JS 渲染 -->
                     </div>
                 </section>
@@ -276,7 +274,7 @@
             });
         }, 50);
 
-        // 获取并渲染我的作品（红框区域）
+        // 获取并渲染我的作品
         async function fetchWorks() {
             try {
                 const res = await fetch('/api/works');
@@ -324,57 +322,38 @@
             } catch (e) { console.error('获取脑洞失败', e); }
         }
 
-        // 获取并渲染工具收藏夹
+        // 获取并渲染工具收藏夹（直接平铺展示，取消分组）
         async function fetchTools() {
             try {
                 const res = await fetch('/api/tools');
                 const json = await res.json();
                 if (!json.success) return;
-                const container = document.getElementById('bookmarkFolders');
-                container.innerHTML = json.data.map((folder, index) => `
-                    <div class="rounded-2xl overflow-hidden border shadow-sm backdrop-blur-sm" style="background-color: var(--card-bg); border-color: var(--border-color); color: var(--text-main);">
-                        <button onclick="toggleAccordion(${index})" class="w-full px-5 py-4 flex items-center justify-between font-bold text-base transition-colors">
-                            <div class="flex items-center gap-3"><span class="text-xl">${folder.icon}</span>${folder.category}</div>
-                            <div class="flex items-center gap-2 text-sm font-normal opacity-60">
-                                ${folder.tools.length} 个工具
-                                <svg id="arrow-${index}" class="w-5 h-5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                            </div>
-                        </button>
-                        <div id="accordion-${index}" class="accordion-content">
-                            <div class="accordion-inner">
-                                <div class="px-4 pb-4 pt-2 grid grid-cols-2 sm:grid-cols-3 gap-3 border-t" style="border-color: var(--border-color);">
-                                    ${folder.tools.map(tool => `
-                                        <div class="hover-lift p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm" 
-                                             style="background-color: var(--item-bg); border-color: var(--border-color); color: var(--text-main);"
-                                             onclick="window.open('${tool.url}', '_blank')">
-                                            <div class="text-2xl flex-shrink-0">${tool.icon}</div>
-                                            <div class="flex-1 min-w-0">
-                                                <div class="text-sm font-bold truncate">${tool.name}</div>
-                                                <div class="text-[11px] truncate mt-0.5 opacity-60">${tool.description}</div>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
+                
+                // 将分组数据打平，提取所有工具
+                let allTools = [];
+                json.data.forEach(folder => {
+                    allTools = allTools.concat(folder.tools);
+                });
+
+                const container = document.getElementById('toolsGrid');
+                if (allTools.length === 0) {
+                    container.innerHTML = `<div class="text-center py-10 opacity-50 w-full col-span-full">暂无工具数据</div>`;
+                    return;
+                }
+
+                // 直接渲染网格
+                container.innerHTML = allTools.map(tool => `
+                    <div class="hover-lift p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm" 
+                         style="background-color: var(--item-bg); border-color: var(--border-color); color: var(--text-main);"
+                         onclick="window.open('${tool.url}', '_blank')">
+                        <div class="text-2xl flex-shrink-0">${tool.icon}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="text-sm font-bold truncate">${tool.name}</div>
+                            <div class="text-[11px] truncate mt-0.5 opacity-60">${tool.description}</div>
                         </div>
                     </div>
                 `).join('');
-                setTimeout(() => toggleAccordion(0), 100);
             } catch (e) { console.error('获取工具失败', e); }
-        }
-
-        // 手风琴展开/收起
-        function toggleAccordion(index) {
-            const content = document.getElementById(`accordion-${index}`);
-            const arrow = document.getElementById(`arrow-${index}`);
-            if (!content || !arrow) return;
-            if (content.classList.contains('open')) {
-                content.classList.remove('open'); arrow.style.transform = 'rotate(0deg)';
-            } else {
-                document.querySelectorAll('.accordion-content').forEach(el => el.classList.remove('open'));
-                document.querySelectorAll('[id^="arrow-"]').forEach(el => el.style.transform = 'rotate(0deg)');
-                content.classList.add('open'); arrow.style.transform = 'rotate(180deg)';
-            }
         }
 
         // 弹窗控制
@@ -413,9 +392,9 @@
 
         // 页面加载完成后拉取数据
         document.addEventListener('DOMContentLoaded', () => {
-            fetchWorks();  // 加载红框区域的作品
-            fetchIdeas();  // 加载脑洞橱窗
-            fetchTools();  // 加载工具收藏夹
+            fetchWorks();
+            fetchIdeas();
+            fetchTools();
         });
     </script>
 </body>
