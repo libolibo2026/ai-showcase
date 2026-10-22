@@ -131,6 +131,48 @@
         .hover-lift:active { transform: scale(0.97); }
         .btn-primary { background: var(--accent-gradient); color: var(--accent-text); box-shadow: 0 4px 15px -3px rgba(189, 144, 52, 0.4); transition: all 0.2s ease; }
         .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+
+        /* 悬停气泡 (Tooltip) */
+        .tooltip-container { position: relative; }
+        .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background-color: var(--text-main);
+            color: var(--bg-base);
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            line-height: 1.4;
+            white-space: normal;
+            width: max-content;
+            max-width: 220px;
+            z-index: 50;
+            transition: opacity 0.2s, transform 0.2s;
+            pointer-events: none;
+            margin-bottom: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        /* 气泡小箭头 */
+        .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--text-main) transparent transparent transparent;
+        }
+        .tooltip-container:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
     </style>
 </head>
 <body class="pb-24">
@@ -157,7 +199,6 @@
         <!-- 板块 1：我的实验室 -->
         <section class="section-box section-1 !p-4 sm:!p-6">
             <div class="relative rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center border" style="background: var(--hero-bg); border-color: var(--hero-border); box-shadow: var(--hero-shadow);">
-                
                 <!-- 左侧文字区 -->
                 <div class="relative z-10 w-full md:w-5/12 flex flex-col justify-center">
                     <div class="mb-2">
@@ -176,15 +217,12 @@
                         </button>
                     </div>
                 </div>
-
                 <!-- 右侧作品展示网格 -->
                 <div class="relative z-10 w-full md:w-7/12 rounded-xl overflow-hidden flex flex-col">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" id="myWorksGrid">
-                        <!-- JS 动态渲染我的作品 -->
                         <div class="text-center py-10 opacity-50 w-full col-span-full">加载中...</div>
                     </div>
                 </div>
-
             </div>
         </section>
 
@@ -206,17 +244,17 @@
                 </section>
             </div>
 
-            <!-- 板块 3：常用工具收藏夹（改为平铺直接展示） -->
+            <!-- 板块 3：常用工具收藏夹（彻底打平，无分类） -->
             <div class="md:col-span-7 space-y-6">
                 <section class="section-box section-3 h-full">
                     <div class="flex items-center gap-2 mb-4 px-1">
                         <span class="text-2xl">📂</span>
                         <div>
                             <h2 class="text-xl title-bold">常用工具收藏夹</h2>
-                            <p class="text-xs font-medium opacity-70">点击图标直达，方便快捷</p>
+                            <p class="text-xs font-medium opacity-70">鼠标悬停可查看完整介绍</p>
                         </div>
                     </div>
-                    <!-- 这里不再使用手风琴，直接展示网格 -->
+                    <!-- 直接铺满的工具网格 -->
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="toolsGrid">
                         <!-- JS 渲染 -->
                     </div>
@@ -322,14 +360,14 @@
             } catch (e) { console.error('获取脑洞失败', e); }
         }
 
-        // 获取并渲染工具收藏夹（直接平铺展示，取消分组）
+        // 获取并渲染工具收藏夹（彻底打平，全部直接展示）
         async function fetchTools() {
             try {
                 const res = await fetch('/api/tools');
                 const json = await res.json();
                 if (!json.success) return;
                 
-                // 将分组数据打平，提取所有工具
+                // 将所有分组里的工具全部提取出来放在一个大数组里
                 let allTools = [];
                 json.data.forEach(folder => {
                     allTools = allTools.concat(folder.tools);
@@ -341,9 +379,9 @@
                     return;
                 }
 
-                // 直接渲染网格
+                // 直接渲染所有工具，不加分类标题
                 container.innerHTML = allTools.map(tool => `
-                    <div class="hover-lift p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm" 
+                    <div class="hover-lift tooltip-container p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm" 
                          style="background-color: var(--item-bg); border-color: var(--border-color); color: var(--text-main);"
                          onclick="window.open('${tool.url}', '_blank')">
                         <div class="text-2xl flex-shrink-0">${tool.icon}</div>
@@ -351,6 +389,8 @@
                             <div class="text-sm font-bold truncate">${tool.name}</div>
                             <div class="text-[11px] truncate mt-0.5 opacity-60">${tool.description}</div>
                         </div>
+                        <!-- 悬停显示完整简介 -->
+                        <div class="tooltip-text">${tool.description}</div>
                     </div>
                 `).join('');
             } catch (e) { console.error('获取工具失败', e); }
