@@ -8,7 +8,7 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(180deg, #E2E7D3 0%, #F2F5EA 100%);
-            --bg-base: #ffffff; /* 补上这个，用于气泡文字颜色 */
+            --bg-base: #ffffff;
             --nav-bg: rgba(255, 255, 255, 0.75);
             --nav-border: rgba(0, 0, 0, 0.05);
             --sec-1-bg: rgba(255, 255, 255, 0.85); 
@@ -31,10 +31,14 @@
             --toggle-active-bg: #ffffff;
             --toggle-active-text: #2b3623;
             --toggle-active-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            
+            /* 页脚专属颜色 */
+            --footer-logo-bg: #77b99a;
+            --footer-logo-text: #011A17;
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(180deg, #011A17 0%, #012D28 100%);
-            --bg-base: #011A17; /* 深色模式下文字变暗色 */
+            --bg-base: #011A17;
             --nav-bg: rgba(1, 26, 23, 0.85);
             --nav-border: rgba(255, 255, 255, 0.05);
             --sec-1-bg: rgba(37, 116, 91, 0.15); 
@@ -57,10 +61,13 @@
             --toggle-active-bg: rgba(119, 185, 154, 0.2);
             --toggle-active-text: #77b99a;
             --toggle-active-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            
+            --footer-logo-bg: #77b99a;
+            --footer-logo-text: #011A17;
         }
         [data-theme="eye"] {
             --bg-gradient: linear-gradient(180deg, #DFE3C8 0%, #EAEDD9 100%);
-            --bg-base: #3d4411; /* 护眼模式文字深色 */
+            --bg-base: #3d4411;
             --nav-bg: rgba(234, 237, 217, 0.85);
             --nav-border: rgba(0, 0, 0, 0.05);
             --sec-1-bg: rgba(255, 255, 255, 0.55); 
@@ -83,6 +90,9 @@
             --toggle-active-bg: rgba(255,255,255,0.7);
             --toggle-active-text: #3d4411;
             --toggle-active-shadow: 0 1px 4px rgba(0,0,0,0.08);
+            
+            --footer-logo-bg: #5a7d46;
+            --footer-logo-text: #ffffff;
         }
         body {
             background: var(--bg-gradient);
@@ -92,6 +102,8 @@
             font-family: system-ui, -apple-system, sans-serif;
             -webkit-tap-highlight-color: transparent;
             min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         .glass-nav {
             backdrop-filter: blur(20px);
@@ -135,7 +147,7 @@
         .btn-primary { background: var(--accent-gradient); color: var(--accent-text); box-shadow: 0 4px 15px -3px rgba(189, 144, 52, 0.4); transition: all 0.2s ease; }
         .btn-primary:active { transform: scale(0.96); box-shadow: none; }
 
-        /* 悬停气泡 (Tooltip) 修复版 */
+        /* 悬停气泡 (Tooltip) - IE 兼容暴力修复版 */
         .tooltip-container { position: relative; }
         .tooltip-text {
             visibility: hidden;
@@ -144,8 +156,8 @@
             bottom: 100%;
             left: 50%;
             transform: translateX(-50%) translateY(5px);
-            background-color: var(--text-main);
-            color: var(--bg-base) !important; /* 强制使用高对比度文字颜色 */
+            background-color: #2b3623;
+            color: #ffffff;
             text-align: center;
             padding: 8px 12px;
             border-radius: 8px;
@@ -160,7 +172,6 @@
             margin-bottom: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.2);
         }
-        /* 气泡小箭头 */
         .tooltip-text::after {
             content: "";
             position: absolute;
@@ -169,7 +180,7 @@
             margin-left: -5px;
             border-width: 5px;
             border-style: solid;
-            border-color: var(--text-main) transparent transparent transparent;
+            border-color: #2b3623 transparent transparent transparent;
         }
         .tooltip-container:hover .tooltip-text {
             visibility: visible;
@@ -198,7 +209,8 @@
         </div>
     </header>
 
-    <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+    <!-- 主体内容添加 flex-grow 确保页脚沉底 -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 space-y-8">
         <!-- 板块 1：我的实验室 -->
         <section class="section-box section-1 !p-4 sm:!p-6">
             <div class="relative rounded-2xl p-6 sm:p-8 flex flex-col md:flex-row gap-8 items-center border" style="background: var(--hero-bg); border-color: var(--hero-border); box-shadow: var(--hero-shadow);">
@@ -266,6 +278,21 @@
         </div>
     </main>
 
+    <!-- ================= 页脚 (Footer) ================= -->
+    <footer class="w-full py-10 mt-6 border-t" style="border-color: var(--border-color);">
+        <div class="max-w-6xl mx-auto px-4 flex flex-col items-center justify-center gap-3">
+            <div class="flex items-center gap-2">
+                <div class="w-7 h-7 rounded-lg flex items-center justify-center font-bold text-sm" style="background-color: var(--footer-logo-bg); color: var(--footer-logo-text);">
+                    方
+                </div>
+                <span class="text-base font-bold tracking-wide" style="color: var(--text-main);">方塘 Mindfeed</span>
+            </div>
+            <p class="text-xs font-medium opacity-60" style="color: var(--text-sub);">
+                &copy; <span id="currentYear">2026</span> 方塘 Mindfeed. 保留所有权利。
+            </p>
+        </div>
+    </footer>
+
     <div class="fixed bottom-8 right-8 z-40">
         <button onclick="openSubmitModal()" class="btn-primary w-16 h-16 rounded-full flex items-center justify-center">
             <span class="text-3xl font-light">＋</span>
@@ -298,6 +325,9 @@
     </div>
 
     <script>
+        // 动态获取当前年份，自动更新版权信息
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
         // 主题控制
         function setTheme(theme, btn) {
             document.documentElement.setAttribute('data-theme', theme);
