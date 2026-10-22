@@ -8,6 +8,7 @@
     <style>
         :root {
             --bg-gradient: linear-gradient(180deg, #E2E7D3 0%, #F2F5EA 100%);
+            --bg-base: #ffffff; /* 补上这个，用于气泡文字颜色 */
             --nav-bg: rgba(255, 255, 255, 0.75);
             --nav-border: rgba(0, 0, 0, 0.05);
             --sec-1-bg: rgba(255, 255, 255, 0.85); 
@@ -33,6 +34,7 @@
         }
         [data-theme="dark"] {
             --bg-gradient: linear-gradient(180deg, #011A17 0%, #012D28 100%);
+            --bg-base: #011A17; /* 深色模式下文字变暗色 */
             --nav-bg: rgba(1, 26, 23, 0.85);
             --nav-border: rgba(255, 255, 255, 0.05);
             --sec-1-bg: rgba(37, 116, 91, 0.15); 
@@ -58,6 +60,7 @@
         }
         [data-theme="eye"] {
             --bg-gradient: linear-gradient(180deg, #DFE3C8 0%, #EAEDD9 100%);
+            --bg-base: #3d4411; /* 护眼模式文字深色 */
             --nav-bg: rgba(234, 237, 217, 0.85);
             --nav-border: rgba(0, 0, 0, 0.05);
             --sec-1-bg: rgba(255, 255, 255, 0.55); 
@@ -132,7 +135,7 @@
         .btn-primary { background: var(--accent-gradient); color: var(--accent-text); box-shadow: 0 4px 15px -3px rgba(189, 144, 52, 0.4); transition: all 0.2s ease; }
         .btn-primary:active { transform: scale(0.96); box-shadow: none; }
 
-        /* 悬停气泡 (Tooltip) */
+        /* 悬停气泡 (Tooltip) 修复版 */
         .tooltip-container { position: relative; }
         .tooltip-text {
             visibility: hidden;
@@ -142,7 +145,7 @@
             left: 50%;
             transform: translateX(-50%) translateY(5px);
             background-color: var(--text-main);
-            color: var(--bg-base);
+            color: var(--bg-base) !important; /* 强制使用高对比度文字颜色 */
             text-align: center;
             padding: 8px 12px;
             border-radius: 8px;
@@ -360,14 +363,13 @@
             } catch (e) { console.error('获取脑洞失败', e); }
         }
 
-        // 获取并渲染工具收藏夹（彻底打平，全部直接展示）
+        // 获取并渲染工具收藏夹
         async function fetchTools() {
             try {
                 const res = await fetch('/api/tools');
                 const json = await res.json();
                 if (!json.success) return;
                 
-                // 将所有分组里的工具全部提取出来放在一个大数组里
                 let allTools = [];
                 json.data.forEach(folder => {
                     allTools = allTools.concat(folder.tools);
@@ -379,9 +381,8 @@
                     return;
                 }
 
-                // 直接渲染所有工具，不加分类标题
                 container.innerHTML = allTools.map(tool => `
-                    <div class="hover-lift tooltip-container p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm" 
+                    <div class="hover-lift tooltip-container p-3 rounded-xl border flex items-center gap-3 cursor-pointer shadow-sm relative" 
                          style="background-color: var(--item-bg); border-color: var(--border-color); color: var(--text-main);"
                          onclick="window.open('${tool.url}', '_blank')">
                         <div class="text-2xl flex-shrink-0">${tool.icon}</div>
