@@ -6,80 +6,57 @@
     <title>AI橱窗 - 发现好用的AI工具与作品</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* ================= 核心色彩系统 (统一青绿色相) ================= */
         :root {
-            /* ☀️ 白天模式：极简通透、晨雾灰绿 */
             --bg-base: #E9EFEB;
             --bg-gradient: linear-gradient(180deg, #E9EFEB 0%, #F4F7F5 100%);
             --nav-bg: rgba(244, 247, 245, 0.85);
-            
             --text-main: #1A2B23;
             --text-sub: #5E7568;
             --text-inverse: #FFFFFF;
-            
             --card-bg: #FFFFFF;
             --border-color: rgba(26, 43, 35, 0.08);
             --hover-shadow: 0 8px 24px -8px rgba(26, 43, 35, 0.1);
-            
             --accent: #4C7A64;
             --accent-hover: #3B614F;
-            
             --toggle-bg: rgba(26, 43, 35, 0.06);
             --toggle-active-bg: #FFFFFF;
-            
             --tooltip-bg: #1A2B23;
             --tooltip-text: #FFFFFF;
         }
-
         [data-theme="dark"] {
-            /* 🌙 夜晚模式：极夜深空、静谧黑绿 */
             --bg-base: #0A100D;
             --bg-gradient: linear-gradient(180deg, #0A100D 0%, #111A16 100%);
             --nav-bg: rgba(10, 16, 13, 0.85);
-            
             --text-main: #B8D4C6;
             --text-sub: #769985;
             --text-inverse: #0A100D;
-            
             --card-bg: #131F19;
             --border-color: rgba(184, 212, 198, 0.1);
             --hover-shadow: 0 8px 24px -8px rgba(0, 0, 0, 0.5);
-            
             --accent: #638F78;
             --accent-hover: #7AA88E;
-            
             --toggle-bg: rgba(184, 212, 198, 0.05);
             --toggle-active-bg: #1E3126;
-            
             --tooltip-bg: #B8D4C6;
             --tooltip-text: #0A100D;
         }
-
         [data-theme="eye"] {
-            /* 👁️ 护眼模式：纸张暖阳、枯叶灰绿 */
             --bg-base: #DCDED1;
             --bg-gradient: linear-gradient(180deg, #DCDED1 0%, #EAECE3 100%);
             --nav-bg: rgba(234, 236, 227, 0.85);
-            
             --text-main: #2F3629;
             --text-sub: #68705F;
             --text-inverse: #FFFFFF;
-            
             --card-bg: #F3F5EF;
             --border-color: rgba(47, 54, 41, 0.08);
             --hover-shadow: 0 8px 24px -8px rgba(47, 54, 41, 0.1);
-            
             --accent: #657755;
             --accent-hover: #526144;
-            
             --toggle-bg: rgba(47, 54, 41, 0.06);
             --toggle-active-bg: #F3F5EF;
-            
             --tooltip-bg: #2F3629;
             --tooltip-text: #FFFFFF;
         }
-
-        /* ================= 基础样式 ================= */
         body {
             background: var(--bg-gradient);
             background-attachment: fixed;
@@ -92,21 +69,18 @@
             flex-direction: column;
             -webkit-font-smoothing: antialiased;
         }
-
         .glass-nav {
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             background-color: var(--nav-bg);
             border-bottom: 1px solid var(--border-color);
         }
-        
         .logo-box {
             background-color: var(--text-main);
             color: var(--bg-base); 
             font-weight: 800;
             transition: all 0.3s ease;
         }
-
         .search-box {
             background-color: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -124,6 +98,8 @@
             border: 1px solid var(--border-color);
             border-radius: 24px;
             box-shadow: 0 4px 20px -10px rgba(0,0,0,0.02);
+            position: relative;
+            overflow: hidden;
         }
 
         .item-card {
@@ -131,12 +107,34 @@
             border: 1px solid transparent;
             border-radius: 16px;
             transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
         }
         .item-card:hover {
             background-color: var(--bg-base);
             border-color: var(--border-color);
             transform: translateY(-2px);
             box-shadow: var(--hover-shadow);
+        }
+
+        /* 大号编号背景字 */
+        .bg-number {
+            position: absolute;
+            right: -5px;
+            bottom: -20px;
+            font-size: 6rem;
+            font-weight: 900;
+            font-family: "Oswald", "Impact", sans-serif;
+            color: var(--text-main);
+            opacity: 0.04;
+            line-height: 1;
+            pointer-events: none;
+            transition: all 0.3s ease;
+            letter-spacing: -2px;
+        }
+        .item-card:hover .bg-number {
+            opacity: 0.08;
+            transform: scale(1.05) translate(-2px, -2px);
         }
 
         .btn-primary {
@@ -157,7 +155,21 @@
         .btn-secondary:hover { background-color: var(--toggle-bg); }
         .btn-secondary:active { transform: scale(0.98); }
 
-        /* ================= 极简主题切换器 ================= */
+        /* 脉冲动效 (持续创作中) */
+        .pulse-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            box-shadow: 0 0 0 0 rgba(76, 122, 100, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 122, 100, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(76, 122, 100, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(76, 122, 100, 0); }
+        }
+
         .theme-switch {
             display: flex;
             background-color: var(--toggle-bg);
@@ -186,7 +198,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* ================= Tooltip 气泡 ================= */
         .tooltip-container { position: relative; }
         .tooltip-text {
             visibility: hidden;
@@ -230,7 +241,6 @@
 </head>
 <body class="pb-24">
 
-    <!-- 顶部导航 -->
     <header class="sticky top-0 z-50 glass-nav">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
@@ -243,7 +253,6 @@
                 <input type="text" id="searchInput" placeholder="搜索工具或网站..." class="search-box w-full pl-10 pr-4 py-2 rounded-xl text-sm focus:outline-none">
             </div>
 
-            <!-- 极简 SVG 主题切换 -->
             <div class="theme-switch flex-shrink-0">
                 <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
@@ -258,7 +267,6 @@
         </div>
     </header>
 
-    <!-- 主体内容 -->
     <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-8 space-y-6">
         
         <!-- 站长作品区 -->
@@ -279,18 +287,22 @@
                         </button>
                     </div>
                 </div>
+                
                 <!-- 我的作品网格 -->
                 <div class="w-full md:w-7/12">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="myWorksGrid">
                         <div class="text-center py-10 opacity-50 text-sm w-full col-span-full">加载数据中...</div>
                     </div>
+                    <!-- 持续创作中提示 -->
+                    <div class="mt-4 flex items-center justify-center gap-2">
+                        <div class="pulse-dot"></div>
+                        <span class="text-xs font-medium tracking-widest" style="color: var(--text-sub);">持续创作中 · 敬请期待</span>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- 下半部分双列 -->
         <div class="grid grid-cols-1 md:grid-cols-12 gap-6">
-            
             <!-- AI 脑洞橱窗 -->
             <div class="md:col-span-5 md:order-last">
                 <section class="section-card p-5 h-full">
@@ -321,7 +333,6 @@
         </div>
     </main>
 
-    <!-- 页脚 -->
     <footer class="w-full py-10 mt-auto border-t" style="border-color: var(--border-color);">
         <div class="max-w-6xl mx-auto px-4 flex flex-col items-center justify-center gap-3">
             <div class="flex items-center gap-2">
@@ -336,7 +347,6 @@
         </div>
     </footer>
 
-    <!-- 悬浮提交按钮 -->
     <div class="fixed bottom-8 right-8 z-40">
         <button onclick="openSubmitModal()" class="btn-primary w-14 h-14 rounded-full flex items-center justify-center shadow-lg">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
@@ -387,6 +397,23 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
+        // 记录点击量工具函数
+        async function trackHit(id, type) {
+            try {
+                await fetch('/api/hit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id, type })
+                });
+            } catch (e) { console.error('统计失败'); }
+        }
+
+        // 统一的打开链接函数
+        function handleOpen(url, id, type) {
+            if (id) trackHit(id, type); // 静默统计
+            window.open(url, '_blank');
+        }
+
         async function fetchWorks() {
             try {
                 const res = await fetch('/api/works');
@@ -394,15 +421,29 @@
                 if (!json.success || !json.data.length) return;
                 
                 const grid = document.getElementById('myWorksGrid');
-                grid.innerHTML = json.data.map(item => `
-                    <div class="item-card p-4 cursor-pointer flex flex-col justify-center" onclick="window.open('${item.url}', '_blank')">
-                        <div class="flex items-center gap-3 mb-1">
-                            <div class="text-xl flex-shrink-0">${item.icon}</div>
-                            <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                grid.innerHTML = json.data.map((item, index) => {
+                    // 生成 01, 02 编号
+                    const numStr = (index + 1).toString().padStart(2, '0');
+                    // 如果没有 views 字段，默认显示 0
+                    const views = item.views || 0;
+                    
+                    return `
+                    <div class="item-card p-4 cursor-pointer flex flex-col justify-center" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
+                        <!-- 大号编号 -->
+                        <div class="bg-number">${numStr}</div>
+                        
+                        <div class="flex items-center justify-between mb-1 relative z-10">
+                            <div class="flex items-center gap-2 max-w-[70%]">
+                                <div class="text-lg flex-shrink-0">${item.icon}</div>
+                                <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                            </div>
+                            <span class="text-[10px] font-mono opacity-50 flex items-center gap-0.5">
+                                👁️ ${views}
+                            </span>
                         </div>
-                        <p class="text-xs line-clamp-1" style="color: var(--text-sub);">${item.description}</p>
+                        <p class="text-xs line-clamp-1 relative z-10" style="color: var(--text-sub);">${item.description}</p>
                     </div>
-                `).join('');
+                `}).join('');
             } catch (e) { 
                 console.error('获取作品失败', e);
                 document.getElementById('myWorksGrid').innerHTML = `<div class="text-center py-10 opacity-50 text-sm w-full col-span-full">暂无作品数据</div>`;
@@ -418,15 +459,20 @@
                 let html = '';
                 
                 if (json.success && json.data.length > 0) {
-                    html = json.data.map(item => `
-                        <div class="item-card p-3 flex gap-3 cursor-pointer" onclick="window.open('${item.url}', '_blank')">
+                    html = json.data.map(item => {
+                        const views = item.views || 0;
+                        return `
+                        <div class="item-card p-3 flex gap-3 cursor-pointer relative" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
                             <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl flex-shrink-0" style="background: var(--bg-base);">${item.icon}</div>
                             <div class="flex-1 min-w-0 flex flex-col justify-center">
-                                <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                    <span class="text-[10px] font-mono opacity-50">👁️ ${views}</span>
+                                </div>
                                 <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-sub);">${item.description}</p>
                             </div>
                         </div>
-                    `).join('');
+                    `}).join('');
                 }
                 
                 // 追加“欢迎录入”卡片
