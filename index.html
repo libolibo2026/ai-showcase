@@ -108,7 +108,6 @@
             border-radius: 20px;
             box-shadow: 0 4px 20px -10px rgba(0,0,0,0.02);
             position: relative;
-            /* 关键修复：去掉 overflow: hidden，允许气泡超出 */
         }
 
         .item-card {
@@ -117,12 +116,10 @@
             border-radius: 12px;
             transition: all 0.2s ease;
             position: relative;
-            /* 关键修复：去掉 overflow: hidden */
             display: flex;
             align-items: center;
         }
         
-        /* 关键修复：鼠标悬浮时，强行提升该卡片的层级，防止被相邻卡片遮挡 */
         .item-card:hover {
             background-color: var(--bg-base);
             border-color: var(--border-color);
@@ -215,7 +212,6 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
         }
 
-        /* 气泡修复 */
         .tooltip-container { position: relative; }
         .tooltip-text {
             visibility: hidden;
@@ -234,8 +230,8 @@
             line-height: 1.4;
             white-space: normal;
             width: max-content;
-            max-width: 220px; /* 限制最大宽度 */
-            z-index: 9999; /* 极高的层级，保证在最高层 */
+            max-width: 220px;
+            z-index: 9999;
             transition: opacity 0.2s ease, transform 0.2s ease;
             pointer-events: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.15);
@@ -426,6 +422,28 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
+        // 自动获取网站 Logo 的核心函数
+        function getFavicon(url, fallbackIcon) {
+            try {
+                // 提取域名，例如从 https://www.remove.bg/zh 提取 remove.bg
+                let domain = new URL(url).hostname;
+                // 使用 DuckDuckGo 的高清图标 API
+                let faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
+                
+                // 渲染 img，如果加载失败（onerror），则隐藏图片并显示 Emoji
+                return `
+                    <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                        <img src="${faviconUrl}" alt="logo" class="w-5 h-5 object-contain rounded-sm" 
+                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <span style="display:none;" class="text-base">${fallbackIcon}</span>
+                    </div>
+                `;
+            } catch (e) {
+                // URL 格式错误时直接显示 Emoji
+                return `<div class="w-6 h-6 flex items-center justify-center flex-shrink-0 text-base">${fallbackIcon}</div>`;
+            }
+        }
+
         async function fetchStats() {
             try {
                 const res = await fetch('/api/stats');
@@ -481,6 +499,7 @@
                 grid.innerHTML = json.data.map((item, index) => {
                     const numStr = (index + 1).toString().padStart(2, '0');
                     const views = item.views || 0;
+                    const logoHtml = getFavicon(item.url, item.icon);
                     
                     return `
                     <div class="item-card p-3 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
@@ -488,8 +507,8 @@
                             <div class="giant-number">${numStr}</div>
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-0.5">
-                                    <h3 class="text-sm font-bold truncate flex items-center gap-1.5">
-                                        <span>${item.icon}</span> ${item.name}
+                                    <h3 class="text-sm font-bold truncate flex items-center gap-2">
+                                        ${logoHtml} ${item.name}
                                     </h3>
                                     <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
                                 </div>
@@ -516,11 +535,14 @@
                     html = json.data.map((item, index) => {
                         const views = item.views || 0;
                         const numStr = (index + 1).toString().padStart(2, '0');
+                        const logoHtml = getFavicon(item.url, item.icon);
                         return `
                         <div class="item-card p-2.5 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
                             <div class="flex items-center gap-3">
                                 <div class="giant-number" style="font-size: 2.2rem; width: 3rem;">${numStr}</div>
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0" style="background: var(--bg-base);">${item.icon}</div>
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--bg-base);">
+                                    ${logoHtml}
+                                </div>
                                 <div class="flex-1 min-w-0 flex flex-col justify-center">
                                     <div class="flex items-center justify-between">
                                         <h3 class="text-sm font-bold truncate">${item.name}</h3>
@@ -564,16 +586,18 @@
                     return;
                 }
 
-                container.innerHTML = allTools.map(tool => `
+                container.innerHTML = allTools.map(tool => {
+                    const logoHtml = getFavicon(tool.url, tool.icon);
+                    return `
                     <div class="item-card tooltip-container p-2.5 flex flex-col justify-center cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
-                        <div class="flex items-center gap-1.5 mb-1">
-                            <div class="text-base flex-shrink-0">${tool.icon}</div>
+                        <div class="flex items-center gap-2 mb-1">
+                            ${logoHtml}
                             <div class="text-xs font-bold truncate">${tool.name}</div>
                         </div>
                         <div class="text-[10px] truncate" style="color: var(--text-sub);">${tool.description}</div>
                         <div class="tooltip-text">${tool.description}</div>
                     </div>
-                `).join('');
+                `}).join('');
             } catch (e) { console.error('获取工具失败', e); }
         }
 
