@@ -22,10 +22,9 @@
             --toggle-active-bg: #FFFFFF;
             --tooltip-bg: #1A2B23;
             --tooltip-text: #FFFFFF;
-            
-            /* 超大编号的颜色，默认半透明，hover时高亮 */
             --num-color: rgba(76, 122, 100, 0.15);
             --num-hover-color: rgba(76, 122, 100, 0.8);
+            --stat-bg: rgba(255, 255, 255, 0.6);
         }
         [data-theme="dark"] {
             --bg-base: #0A100D;
@@ -43,9 +42,9 @@
             --toggle-active-bg: #1E3126;
             --tooltip-bg: #B8D4C6;
             --tooltip-text: #0A100D;
-            
             --num-color: rgba(119, 185, 154, 0.15);
             --num-hover-color: rgba(119, 185, 154, 0.8);
+            --stat-bg: rgba(19, 31, 25, 0.6);
         }
         [data-theme="eye"] {
             --bg-base: #DCDED1;
@@ -63,9 +62,9 @@
             --toggle-active-bg: #F3F5EF;
             --tooltip-bg: #2F3629;
             --tooltip-text: #FFFFFF;
-            
             --num-color: rgba(101, 119, 85, 0.15);
             --num-hover-color: rgba(101, 119, 85, 0.8);
+            --stat-bg: rgba(243, 245, 239, 0.6);
         }
         body {
             background: var(--bg-gradient);
@@ -128,7 +127,6 @@
             box-shadow: var(--hover-shadow);
         }
 
-        /* 超大个性编号设计 */
         .giant-number {
             font-family: 'Impact', 'Arial Black', sans-serif;
             font-size: 2.5rem;
@@ -140,7 +138,7 @@
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             user-select: none;
             flex-shrink: 0;
-            width: 3.5rem; /* 固定宽度，保证右侧对齐 */
+            width: 3.5rem;
             text-align: left;
         }
         @media (min-width: 640px) {
@@ -257,6 +255,7 @@
 </head>
 <body class="pb-20">
 
+    <!-- 顶部导航栏 (去掉了搜索框，让布局更清爽) -->
     <header class="sticky top-0 z-50 glass-nav">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
@@ -264,26 +263,55 @@
                 <h1 class="text-lg font-bold tracking-tight hidden sm:block">AI橱窗</h1>
             </div>
             
-            <div class="relative flex-1 max-w-[280px] sm:max-w-md">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                <input type="text" id="searchInput" placeholder="搜索工具或网站..." class="search-box w-full pl-9 pr-4 py-1.5 rounded-lg text-sm focus:outline-none">
-            </div>
-
-            <div class="theme-switch flex-shrink-0">
-                <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                </button>
-                <button onclick="setTheme('dark', this)" class="theme-btn" title="夜晚模式">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                </button>
-                <button onclick="setTheme('eye', this)" class="theme-btn" title="护眼模式">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+            <div class="flex items-center gap-3">
+                <div class="theme-switch flex-shrink-0">
+                    <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    </button>
+                    <button onclick="setTheme('dark', this)" class="theme-btn" title="夜晚模式">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    </button>
+                    <button onclick="setTheme('eye', this)" class="theme-btn" title="护眼模式">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </button>
+                </div>
+                <button onclick="openSubmitModal()" class="btn-primary px-4 py-1.5 rounded-lg font-bold text-sm hidden sm:flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    提交工具
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-5 space-y-5">
+    <!-- 新增：Hero 搜索与统计区 (对应截图) -->
+    <section class="max-w-4xl mx-auto px-4 pt-10 pb-6 text-center">
+        <!-- 大搜索框 -->
+        <div class="relative max-w-2xl mx-auto mb-10">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <input type="text" id="searchInput" placeholder="按名称、描述或标签搜索 AI 工具..." class="search-box w-full pl-12 pr-4 py-3.5 rounded-2xl text-base focus:outline-none shadow-sm">
+        </div>
+
+        <!-- 统计数据 -->
+        <div class="flex items-center justify-center gap-8 sm:gap-16">
+            <div class="flex flex-col items-center">
+                <span class="text-3xl font-black" style="color: var(--text-main);" id="statTools">0</span>
+                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">工具总数</span>
+            </div>
+            <div class="w-px h-8" style="background: var(--border-color);"></div>
+            <div class="flex flex-col items-center">
+                <span class="text-3xl font-black" style="color: var(--text-main);" id="statWorks">0</span>
+                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">作品总数</span>
+            </div>
+            <div class="w-px h-8" style="background: var(--border-color);"></div>
+            <div class="flex flex-col items-center">
+                <span class="text-3xl font-black" style="color: var(--text-main);" id="statViews">0</span>
+                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">累计浏览</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 原有内容区 -->
+    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-2 space-y-5">
         
         <!-- 站长作品区 -->
         <section class="section-card p-5 sm:p-6">
@@ -304,12 +332,10 @@
                     </div>
                 </div>
                 
-                <!-- 我的作品网格 -->
                 <div class="w-full md:w-7/12">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="myWorksGrid">
                         <div class="text-center py-6 opacity-50 text-xs w-full col-span-full">加载数据中...</div>
                     </div>
-                    <!-- 持续创作中提示 -->
                     <div class="mt-4 flex items-center justify-center gap-2">
                         <div class="pulse-dot"></div>
                         <span class="text-[10px] font-medium tracking-widest" style="color: var(--text-sub);">持续创作中 · 敬请期待</span>
@@ -406,6 +432,39 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
+        // --- 获取统计数据 ---
+        async function fetchStats() {
+            try {
+                const res = await fetch('/api/stats');
+                const json = await res.json();
+                if (!json.success) return;
+                const { tools, works, ideas, totalViews } = json.data;
+                
+                // 带动画效果
+                animateValue('statTools', 0, tools, 1000);
+                animateValue('statWorks', 0, works + ideas, 1000);
+                animateValue('statViews', 0, totalViews, 1000);
+            } catch (e) { console.error('获取统计失败', e); }
+        }
+
+        // 数字滚动动画
+        function animateValue(id, start, end, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                obj.innerHTML = Math.floor(progress * (end - start) + start);
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end;
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+
         async function trackHit(id, type) {
             try {
                 await fetch('/api/hit', {
@@ -435,10 +494,7 @@
                     return `
                     <div class="item-card p-3 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
                         <div class="flex items-center gap-3">
-                            <!-- 左侧超大编号 -->
                             <div class="giant-number">${numStr}</div>
-                            
-                            <!-- 右侧内容 -->
                             <div class="flex-1 min-w-0">
                                 <div class="flex items-center justify-between mb-0.5">
                                     <h3 class="text-sm font-bold truncate flex items-center gap-1.5">
@@ -472,10 +528,7 @@
                         return `
                         <div class="item-card p-2.5 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
                             <div class="flex items-center gap-3">
-                                <!-- 左侧超大编号 -->
                                 <div class="giant-number" style="font-size: 2.2rem; width: 3rem;">${numStr}</div>
-                                
-                                <!-- 右侧内容 -->
                                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-lg flex-shrink-0" style="background: var(--bg-base);">${item.icon}</div>
                                 <div class="flex-1 min-w-0 flex flex-col justify-center">
                                     <div class="flex items-center justify-between">
@@ -489,7 +542,6 @@
                     `}).join('');
                 }
                 
-                // 追加“欢迎录入”卡片
                 html += `
                     <div class="mt-2 p-3 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
                          style="border-color: var(--border-color);" onclick="openSubmitModal()">
@@ -567,6 +619,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', () => {
+            fetchStats(); // 页面加载时获取统计数据
             fetchWorks();
             fetchIdeas();
             fetchTools();
