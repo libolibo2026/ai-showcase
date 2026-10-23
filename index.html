@@ -285,7 +285,6 @@
     <section class="max-w-4xl mx-auto px-4 pt-10 pb-6 text-center">
         <div class="relative max-w-2xl mx-auto mb-10">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <!-- 搜索框 -->
             <input type="text" id="searchInput" placeholder="按名称、描述或标签搜索 AI 工具..." class="search-box w-full pl-12 pr-4 py-3.5 rounded-2xl text-base focus:outline-none shadow-sm">
         </div>
 
@@ -307,7 +306,24 @@
         </div>
     </section>
 
-    <main class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-2 space-y-5">
+    <!-- 独立搜索结果面板 (默认隐藏，搜索时才出现) -->
+    <section id="searchResultsSection" class="hidden max-w-6xl mx-auto w-full px-4 sm:px-6 mb-4">
+        <div class="section-card p-5">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b" style="border-color: var(--border-color);">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    搜索结果
+                </h2>
+                <span class="text-xs font-medium px-2 py-1 rounded-full" style="background: var(--bg-base); color: var(--text-sub);" id="searchResultCount">0 个结果</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="searchResultsGrid">
+                <!-- JS 渲染 -->
+            </div>
+        </div>
+    </section>
+
+    <!-- 原有主内容 (搜索时会被隐藏) -->
+    <main id="mainContent" class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-2 space-y-5">
         
         <section class="section-card p-5 sm:p-6">
             <div class="flex flex-col md:flex-row gap-6 items-center">
@@ -407,7 +423,7 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        // 保存全量数据，用于搜索过滤
+        // 全量数据缓存
         const globalData = {
             works: [],
             ideas: [],
@@ -430,7 +446,6 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
-        // 自动获取网站 Logo
         function getFavicon(url, fallbackIcon) {
             try {
                 let domain = new URL(url).hostname;
@@ -492,12 +507,12 @@
             window.open(url, '_blank');
         }
 
-        // ========== 渲染函数 ==========
+        // ========== 渲染逻辑 ==========
 
         function renderWorks(data) {
             const grid = document.getElementById('myWorksGrid');
             if (!data || data.length === 0) {
-                grid.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">未找到匹配的作品</div>`;
+                grid.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无作品</div>`;
                 return;
             }
             grid.innerHTML = data.map((item, index) => {
@@ -548,10 +563,9 @@
                     </div>
                 `}).join('');
             } else {
-                html = `<div class="text-center py-4 opacity-50 text-xs w-full">未找到匹配的脑洞</div>`;
+                html = `<div class="text-center py-4 opacity-50 text-xs w-full">暂无脑洞</div>`;
             }
             
-            // “欢迎录入”卡片永久存在
             html += `
                 <div class="mt-2 p-3 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
                      style="border-color: var(--border-color);" onclick="openSubmitModal()">
@@ -567,7 +581,7 @@
         function renderTools(data) {
             const container = document.getElementById('toolsGrid');
             if (!data || data.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">未找到匹配的工具</div>`;
+                container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无工具</div>`;
                 return;
             }
             container.innerHTML = data.map(tool => {
@@ -584,11 +598,9 @@
             `}).join('');
         }
 
-        // ========== 数据拉取与过滤逻辑 ==========
-
+        // ========== 数据拉取 ==========
         async function fetchData() {
             try {
-                // 并行拉取三个接口
                 const [worksRes, ideasRes, toolsRes] = await Promise.all([
                     fetch('/api/works').then(r => r.json()),
                     fetch('/api/ideas').then(r => r.json()),
@@ -605,7 +617,7 @@
                     globalData.tools = allTools;
                 }
 
-                // 初次渲染全部数据
+                // 初始渲染
                 renderWorks(globalData.works);
                 renderIdeas(globalData.ideas);
                 renderTools(globalData.tools);
@@ -615,30 +627,75 @@
             }
         }
 
-        // 监听搜索输入框
+        // ========== 独立搜索面板逻辑 ==========
         document.getElementById('searchInput').addEventListener('input', (e) => {
             const keyword = e.target.value.trim().toLowerCase();
+            const mainContent = document.getElementById('mainContent');
+            const searchSection = document.getElementById('searchResultsSection');
+            const resultsGrid = document.getElementById('searchResultsGrid');
+            const countLabel = document.getElementById('searchResultCount');
 
-            // 过滤 站长作品
-            const filteredWorks = globalData.works.filter(item => 
-                item.name.toLowerCase().includes(keyword) || 
-                item.description.toLowerCase().includes(keyword)
-            );
-            renderWorks(filteredWorks);
+            // 如果搜索框为空，恢复原状
+            if (keyword === '') {
+                mainContent.classList.remove('hidden');
+                searchSection.classList.add('hidden');
+                return;
+            }
 
-            // 过滤 AI脑洞
-            const filteredIdeas = globalData.ideas.filter(item => 
-                item.name.toLowerCase().includes(keyword) || 
-                item.description.toLowerCase().includes(keyword)
-            );
-            renderIdeas(filteredIdeas);
+            // 如果有关键词，隐藏主内容，展示搜索面板
+            mainContent.classList.add('hidden');
+            searchSection.classList.remove('hidden');
 
-            // 过滤 常用工具
-            const filteredTools = globalData.tools.filter(item => 
-                item.name.toLowerCase().includes(keyword) || 
-                item.description.toLowerCase().includes(keyword)
-            );
-            renderTools(filteredTools);
+            // 聚合搜索
+            let results = [];
+
+            // 搜站长作品
+            globalData.works.forEach(item => {
+                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
+                    results.push({ ...item, type: 'work', typeLabel: '站长作品' });
+                }
+            });
+
+            // 搜脑洞
+            globalData.ideas.forEach(item => {
+                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
+                    results.push({ ...item, type: 'idea', typeLabel: 'AI脑洞' });
+                }
+            });
+
+            // 搜工具
+            globalData.tools.forEach(item => {
+                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
+                    results.push({ ...item, type: 'tool', typeLabel: '常用工具' });
+                }
+            });
+
+            // 更新结果数量
+            countLabel.textContent = `${results.length} 个结果`;
+
+            // 渲染搜索结果
+            if (results.length === 0) {
+                resultsGrid.innerHTML = `<div class="text-center py-10 text-sm opacity-50 col-span-full">没找到与 “${keyword}” 相关的内容</div>`;
+            } else {
+                resultsGrid.innerHTML = results.map(item => {
+                    const logoHtml = getFavicon(item.url, item.icon);
+                    return `
+                    <div class="item-card p-3 cursor-pointer border border-transparent hover:border-[color:var(--accent)]" 
+                         onclick="handleOpen('${item.url}', ${item.id}, '${item.type}')">
+                        <div class="flex items-center gap-3">
+                            ${logoHtml}
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-0.5">
+                                    <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                    <span class="text-[9px] px-1.5 py-0.5 rounded-sm bg-black/5 dark:bg-white/10 opacity-70 whitespace-nowrap">${item.typeLabel}</span>
+                                </div>
+                                <p class="text-xs truncate" style="color: var(--text-sub);">${item.description}</p>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
+            }
         });
 
         function openSubmitModal() {
@@ -675,7 +732,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchStats();
-            fetchData(); // 统一拉取并渲染数据
+            fetchData(); 
         });
     </script>
 </body>
