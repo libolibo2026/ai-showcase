@@ -285,6 +285,7 @@
     <section class="max-w-4xl mx-auto px-4 pt-10 pb-6 text-center">
         <div class="relative max-w-2xl mx-auto mb-10">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+            <!-- 搜索框 -->
             <input type="text" id="searchInput" placeholder="按名称、描述或标签搜索 AI 工具..." class="search-box w-full pl-12 pr-4 py-3.5 rounded-2xl text-base focus:outline-none shadow-sm">
         </div>
 
@@ -406,6 +407,13 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
+        // 保存全量数据，用于搜索过滤
+        const globalData = {
+            works: [],
+            ideas: [],
+            tools: []
+        };
+
         function setTheme(theme, btn) {
             document.documentElement.setAttribute('data-theme', theme);
             document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
@@ -422,15 +430,11 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
-        // 自动获取网站 Logo 的核心函数
+        // 自动获取网站 Logo
         function getFavicon(url, fallbackIcon) {
             try {
-                // 提取域名，例如从 https://www.remove.bg/zh 提取 remove.bg
                 let domain = new URL(url).hostname;
-                // 使用 DuckDuckGo 的高清图标 API
                 let faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-                
-                // 渲染 img，如果加载失败（onerror），则隐藏图片并显示 Emoji
                 return `
                     <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
                         <img src="${faviconUrl}" alt="logo" class="w-5 h-5 object-contain rounded-sm" 
@@ -439,7 +443,6 @@
                     </div>
                 `;
             } catch (e) {
-                // URL 格式错误时直接显示 Emoji
                 return `<div class="w-6 h-6 flex items-center justify-center flex-shrink-0 text-base">${fallbackIcon}</div>`;
             }
         }
@@ -489,117 +492,154 @@
             window.open(url, '_blank');
         }
 
-        async function fetchWorks() {
-            try {
-                const res = await fetch('/api/works');
-                const json = await res.json();
-                if (!json.success || !json.data.length) return;
-                
-                const grid = document.getElementById('myWorksGrid');
-                grid.innerHTML = json.data.map((item, index) => {
-                    const numStr = (index + 1).toString().padStart(2, '0');
+        // ========== 渲染函数 ==========
+
+        function renderWorks(data) {
+            const grid = document.getElementById('myWorksGrid');
+            if (!data || data.length === 0) {
+                grid.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">未找到匹配的作品</div>`;
+                return;
+            }
+            grid.innerHTML = data.map((item, index) => {
+                const numStr = (index + 1).toString().padStart(2, '0');
+                const views = item.views || 0;
+                const logoHtml = getFavicon(item.url, item.icon);
+                return `
+                <div class="item-card p-3 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
+                    <div class="flex items-center gap-3">
+                        <div class="giant-number">${numStr}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between mb-0.5">
+                                <h3 class="text-sm font-bold truncate flex items-center gap-2">
+                                    ${logoHtml} ${item.name}
+                                </h3>
+                                <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
+                            </div>
+                            <p class="text-xs truncate" style="color: var(--text-sub);">${item.description}</p>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function renderIdeas(data) {
+            const grid = document.getElementById('showcaseGrid');
+            let html = '';
+            if (data && data.length > 0) {
+                html = data.map((item, index) => {
                     const views = item.views || 0;
+                    const numStr = (index + 1).toString().padStart(2, '0');
                     const logoHtml = getFavicon(item.url, item.icon);
-                    
                     return `
-                    <div class="item-card p-3 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
+                    <div class="item-card p-2.5 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
                         <div class="flex items-center gap-3">
-                            <div class="giant-number">${numStr}</div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex items-center justify-between mb-0.5">
-                                    <h3 class="text-sm font-bold truncate flex items-center gap-2">
-                                        ${logoHtml} ${item.name}
-                                    </h3>
+                            <div class="giant-number" style="font-size: 2.2rem; width: 3rem;">${numStr}</div>
+                            <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--bg-base);">
+                                ${logoHtml}
+                            </div>
+                            <div class="flex-1 min-w-0 flex flex-col justify-center">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-sm font-bold truncate">${item.name}</h3>
                                     <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
                                 </div>
-                                <p class="text-xs truncate" style="color: var(--text-sub);">${item.description}</p>
+                                <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-sub);">${item.description}</p>
                             </div>
                         </div>
                     </div>
                 `}).join('');
-            } catch (e) { 
-                console.error('获取作品失败', e);
-                document.getElementById('myWorksGrid').innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无作品数据</div>`;
+            } else {
+                html = `<div class="text-center py-4 opacity-50 text-xs w-full">未找到匹配的脑洞</div>`;
+            }
+            
+            // “欢迎录入”卡片永久存在
+            html += `
+                <div class="mt-2 p-3 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
+                     style="border-color: var(--border-color);" onclick="openSubmitModal()">
+                    <div class="w-6 h-6 rounded-full flex items-center justify-center mb-1.5" style="background: var(--bg-base); color: var(--accent);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                    </div>
+                    <span class="text-xs font-bold" style="color: var(--accent);">欢迎录入您的作品</span>
+                </div>
+            `;
+            grid.innerHTML = html;
+        }
+
+        function renderTools(data) {
+            const container = document.getElementById('toolsGrid');
+            if (!data || data.length === 0) {
+                container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">未找到匹配的工具</div>`;
+                return;
+            }
+            container.innerHTML = data.map(tool => {
+                const logoHtml = getFavicon(tool.url, tool.icon);
+                return `
+                <div class="item-card tooltip-container p-2.5 flex flex-col justify-center cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
+                    <div class="flex items-center gap-2 mb-1">
+                        ${logoHtml}
+                        <div class="text-xs font-bold truncate">${tool.name}</div>
+                    </div>
+                    <div class="text-[10px] truncate" style="color: var(--text-sub);">${tool.description}</div>
+                    <div class="tooltip-text">${tool.description}</div>
+                </div>
+            `}).join('');
+        }
+
+        // ========== 数据拉取与过滤逻辑 ==========
+
+        async function fetchData() {
+            try {
+                // 并行拉取三个接口
+                const [worksRes, ideasRes, toolsRes] = await Promise.all([
+                    fetch('/api/works').then(r => r.json()),
+                    fetch('/api/ideas').then(r => r.json()),
+                    fetch('/api/tools').then(r => r.json())
+                ]);
+
+                if (worksRes.success) globalData.works = worksRes.data || [];
+                if (ideasRes.success) globalData.ideas = ideasRes.data || [];
+                if (toolsRes.success) {
+                    let allTools = [];
+                    (toolsRes.data || []).forEach(folder => {
+                        allTools = allTools.concat(folder.tools || []);
+                    });
+                    globalData.tools = allTools;
+                }
+
+                // 初次渲染全部数据
+                renderWorks(globalData.works);
+                renderIdeas(globalData.ideas);
+                renderTools(globalData.tools);
+
+            } catch (e) {
+                console.error("加载数据失败", e);
             }
         }
 
-        async function fetchIdeas() {
-            try {
-                const res = await fetch('/api/ideas');
-                const json = await res.json();
-                
-                const grid = document.getElementById('showcaseGrid');
-                let html = '';
-                
-                if (json.success && json.data.length > 0) {
-                    html = json.data.map((item, index) => {
-                        const views = item.views || 0;
-                        const numStr = (index + 1).toString().padStart(2, '0');
-                        const logoHtml = getFavicon(item.url, item.icon);
-                        return `
-                        <div class="item-card p-2.5 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
-                            <div class="flex items-center gap-3">
-                                <div class="giant-number" style="font-size: 2.2rem; width: 3rem;">${numStr}</div>
-                                <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--bg-base);">
-                                    ${logoHtml}
-                                </div>
-                                <div class="flex-1 min-w-0 flex flex-col justify-center">
-                                    <div class="flex items-center justify-between">
-                                        <h3 class="text-sm font-bold truncate">${item.name}</h3>
-                                        <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
-                                    </div>
-                                    <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-sub);">${item.description}</p>
-                                </div>
-                            </div>
-                        </div>
-                    `}).join('');
-                }
-                
-                html += `
-                    <div class="mt-2 p-3 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
-                         style="border-color: var(--border-color);" onclick="openSubmitModal()">
-                        <div class="w-6 h-6 rounded-full flex items-center justify-center mb-1.5" style="background: var(--bg-base); color: var(--accent);">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        </div>
-                        <span class="text-xs font-bold" style="color: var(--accent);">欢迎录入您的作品</span>
-                    </div>
-                `;
-                
-                grid.innerHTML = html;
-            } catch (e) { console.error('获取脑洞失败', e); }
-        }
+        // 监听搜索输入框
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const keyword = e.target.value.trim().toLowerCase();
 
-        async function fetchTools() {
-            try {
-                const res = await fetch('/api/tools');
-                const json = await res.json();
-                if (!json.success) return;
-                
-                let allTools = [];
-                json.data.forEach(folder => {
-                    allTools = allTools.concat(folder.tools);
-                });
+            // 过滤 站长作品
+            const filteredWorks = globalData.works.filter(item => 
+                item.name.toLowerCase().includes(keyword) || 
+                item.description.toLowerCase().includes(keyword)
+            );
+            renderWorks(filteredWorks);
 
-                const container = document.getElementById('toolsGrid');
-                if (allTools.length === 0) {
-                    container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无工具数据</div>`;
-                    return;
-                }
+            // 过滤 AI脑洞
+            const filteredIdeas = globalData.ideas.filter(item => 
+                item.name.toLowerCase().includes(keyword) || 
+                item.description.toLowerCase().includes(keyword)
+            );
+            renderIdeas(filteredIdeas);
 
-                container.innerHTML = allTools.map(tool => {
-                    const logoHtml = getFavicon(tool.url, tool.icon);
-                    return `
-                    <div class="item-card tooltip-container p-2.5 flex flex-col justify-center cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
-                        <div class="flex items-center gap-2 mb-1">
-                            ${logoHtml}
-                            <div class="text-xs font-bold truncate">${tool.name}</div>
-                        </div>
-                        <div class="text-[10px] truncate" style="color: var(--text-sub);">${tool.description}</div>
-                        <div class="tooltip-text">${tool.description}</div>
-                    </div>
-                `}).join('');
-            } catch (e) { console.error('获取工具失败', e); }
-        }
+            // 过滤 常用工具
+            const filteredTools = globalData.tools.filter(item => 
+                item.name.toLowerCase().includes(keyword) || 
+                item.description.toLowerCase().includes(keyword)
+            );
+            renderTools(filteredTools);
+        });
 
         function openSubmitModal() {
             document.getElementById('submitModal').classList.remove('hidden');
@@ -635,9 +675,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchStats();
-            fetchWorks();
-            fetchIdeas();
-            fetchTools();
+            fetchData(); // 统一拉取并渲染数据
         });
     </script>
 </body>
