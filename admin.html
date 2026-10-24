@@ -11,6 +11,10 @@
         .tab-btn { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .tab-btn.active { background: #4C7A64; color: #FFF; }
         .tab-btn.inactive { background: #FFF; color: #5E7568; border: 1px solid rgba(0,0,0,0.08); }
+        
+        .modal-mask { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
+        .modal-content { animation: slideUp 0.3s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -24,24 +28,68 @@
 
     <!-- 管理区 -->
     <div id="adminSection" class="hidden max-w-5xl mx-auto">
-        <!-- 顶部导航 -->
-        <div class="flex items-center justify-between mb-6">
-            <div class="flex gap-2">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+            <div class="flex flex-wrap gap-2">
                 <button onclick="switchTab('pending')" id="tab-pending" class="tab-btn active">📥 待审核</button>
                 <button onclick="switchTab('ideas')" id="tab-ideas" class="tab-btn inactive">💡 脑洞管理</button>
                 <button onclick="switchTab('tools')" id="tab-tools" class="tab-btn inactive">📁 常用工具</button>
                 <button onclick="switchTab('works')" id="tab-works" class="tab-btn inactive">🎨 站长作品</button>
             </div>
-            <button onclick="logout()" class="text-sm text-gray-500 hover:text-red-500">退出登录</button>
+            <div class="flex gap-3 items-center">
+                <button onclick="openFormModal()" class="bg-[#4C7A64] text-white px-4 py-2 rounded-lg font-bold text-sm shadow-sm hover:bg-[#3B614F] hidden" id="addBtn">+ 新增数据</button>
+                <button onclick="logout()" class="text-sm text-gray-500 hover:text-red-500 font-medium">退出</button>
+            </div>
         </div>
 
-        <!-- 数据列表区 -->
         <div id="listContainer" class="space-y-4"></div>
+    </div>
+
+    <!-- 新增/编辑 统一表单弹窗 -->
+    <div id="formModal" class="fixed inset-0 modal-mask z-50 hidden items-center justify-center p-4">
+        <div class="card modal-content w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-bold" id="modalTitle">新增数据</h2>
+                <button onclick="closeFormModal()" class="text-2xl leading-none opacity-50 hover:opacity-100">&times;</button>
+            </div>
+            
+            <form id="dataForm" onsubmit="handleFormSubmit(event)" class="space-y-4">
+                <input type="hidden" id="formId">
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="col-span-2" id="folderWrapper">
+                        <label class="block text-xs font-bold mb-1.5">所属分类名称</label>
+                        <input type="text" id="formFolder" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="例如：常用工具 / 站长精选">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1.5">网站名称</label>
+                        <input type="text" id="formName" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="名称">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold mb-1.5">网站图标</label>
+                        <input type="text" id="formIcon" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="填 Emoji 或 图片URL">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold mb-1.5">网站链接 (URL)</label>
+                        <input type="url" id="formUrl" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="https://...">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-xs font-bold mb-1.5">简介描述</label>
+                        <textarea id="formDesc" required rows="3" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="一句话介绍它的特色..."></textarea>
+                    </div>
+                </div>
+                
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeFormModal()" class="flex-1 py-2.5 rounded-lg border font-bold text-gray-600 hover:bg-gray-50">取消</button>
+                    <button type="submit" class="flex-1 py-2.5 rounded-lg bg-[#4C7A64] text-white font-bold hover:bg-[#3B614F]">保存提交</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <script>
         let adminPwd = sessionStorage.getItem('admin_pwd') || '';
         let currentTab = 'pending';
+        let currentList = [];
 
         if (adminPwd) { login(); }
 
@@ -68,6 +116,11 @@
             });
             document.getElementById('tab-' + tab).classList.remove('inactive');
             document.getElementById('tab-' + tab).classList.add('active');
+            
+            const addBtn = document.getElementById('addBtn');
+            if (tab === 'pending') { addBtn.classList.add('hidden'); } 
+            else { addBtn.classList.remove('hidden'); }
+            
             loadData();
         }
 
@@ -75,7 +128,7 @@
             try {
                 const headers = { 'X-Admin-Password': adminPwd };
                 let url = '';
-                if (currentTab === 'pending') url = '/api/admin'; // 复用之前的接口，查待审核
+                if (currentTab === 'pending') url = '/api/admin';
                 else if (currentTab === 'tools') url = '/api/tools';
                 else if (currentTab === 'works') url = '/api/works';
                 else if (currentTab === 'ideas') url = '/api/ideas';
@@ -89,40 +142,39 @@
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('adminSection').classList.remove('hidden');
 
-                renderList(json.data);
+                let list = json.data;
+                if (currentTab === 'tools' || currentTab === 'works') {
+                    let flatList = [];
+                    json.data.forEach(folder => { 
+                        (folder.tools || []).forEach(tool => {
+                            tool.folder_name = folder.category; 
+                            flatList.push(tool); 
+                        }); 
+                    });
+                    list = flatList;
+                }
+                currentList = list;
+                renderList(list);
             } catch (e) { alert('请求失败'); }
         }
 
-        function renderList(data) {
+        function renderList(list) {
             const container = document.getElementById('listContainer');
             
-            // 如果是拉取工具，把嵌套的数组拍平
-            let list = data;
-            if (currentTab === 'tools') {
-                list = [];
-                data.forEach(folder => { list = list.concat(folder.tools || []); });
-            }
-
             if (!list || list.length === 0) {
                 container.innerHTML = '<div class="text-center text-gray-500 py-10">暂无数据</div>';
                 return;
             }
 
-            // 对于新增，在顶部放一个按钮
-            let html = '';
-            if (currentTab !== 'pending') {
-                html += `<div class="mb-4 text-right"><button onclick="openEditModal()" class="bg-[#4C7A64] text-white px-4 py-2 rounded-lg text-sm font-bold">+ 新增数据</button></div>`;
-            }
-
-            html += list.map(item => `
-                <div class="card p-5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+            container.innerHTML = list.map(item => `
+                <div class="card p-4 sm:p-5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
                     <div class="flex-1 min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                             <h3 class="font-bold text-lg">${item.name}</h3>
                             ${item.status ? `<span class="text-xs px-2 py-0.5 rounded-full ${item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${item.status === 'approved' ? '已上墙' : '待审核'}</span>` : ''}
                             ${item.folder_name ? `<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${item.folder_name}</span>` : ''}
                         </div>
-                        <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+                        <p class="text-sm text-gray-600 mb-2 leading-relaxed">${item.description}</p>
                         <div class="text-xs text-gray-500 flex flex-wrap gap-3">
                             <span>🔗 <a href="${item.url}" target="_blank" class="text-blue-500 hover:underline">${item.url}</a></span>
                             ${item.contact ? `<span class="bg-gray-100 px-2 py-1 rounded">📞 ${item.contact}</span>` : ''}
@@ -130,16 +182,87 @@
                     </div>
                     <div class="flex gap-2 shrink-0 flex-wrap">
                         ${currentTab === 'pending' ? `
-                            <button onclick="handleAction(${item.id}, 'approve', 'community_ideas')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg">通过</button>
-                            <button onclick="handleAction(${item.id}, 'delete', 'community_ideas')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg">删除</button>
+                            <button onclick="handleAction(${item.id}, 'approve', 'community_ideas')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600">通过</button>
+                            <button onclick="handleAction(${item.id}, 'delete', 'community_ideas')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
                         ` : `
-                            <button onclick='openEditModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg">编辑</button>
-                            <button onclick="handleAction(${item.id}, 'delete', '${currentTab === 'tools' ? 'tools' : 'my_works'}')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg">删除</button>
+                            <button onclick="openFormModal(${item.id})" class="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100">编辑</button>
+                            <button onclick="handleAction(${item.id}, 'delete', '${currentTab === 'tools' ? 'tools' : 'my_works'}')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
                         `}
                     </div>
                 </div>
             `).join('');
-            container.innerHTML = html;
+        }
+
+        function openFormModal(id = null) {
+            document.getElementById('formModal').classList.remove('hidden');
+            document.getElementById('formModal').classList.add('flex');
+            
+            const title = document.getElementById('modalTitle');
+            const folderWrapper = document.getElementById('folderWrapper');
+            
+            if (currentTab === 'ideas') {
+                folderWrapper.style.display = 'none';
+            } else {
+                folderWrapper.style.display = 'block';
+            }
+
+            if (id) {
+                title.textContent = '编辑数据';
+                const item = currentList.find(i => i.id === id);
+                if (item) {
+                    document.getElementById('formId').value = item.id;
+                    document.getElementById('formName').value = item.name;
+                    document.getElementById('formUrl').value = item.url;
+                    document.getElementById('formDesc').value = item.description;
+                    document.getElementById('formIcon').value = item.icon || '';
+                    document.getElementById('formFolder').value = item.folder_name || (currentTab === 'tools' ? '常用工具' : '站长精选');
+                }
+            } else {
+                title.textContent = '新增数据';
+                document.getElementById('formId').value = '';
+                document.getElementById('formName').value = '';
+                document.getElementById('formUrl').value = '';
+                document.getElementById('formDesc').value = '';
+                document.getElementById('formIcon').value = '';
+                document.getElementById('formFolder').value = currentTab === 'tools' ? '常用工具' : '站长精选';
+            }
+        }
+
+        function closeFormModal() {
+            document.getElementById('formModal').classList.add('hidden');
+            document.getElementById('formModal').classList.remove('flex');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('formId').value;
+            const name = document.getElementById('formName').value;
+            const url = document.getElementById('formUrl').value;
+            const description = document.getElementById('formDesc').value;
+            const icon = document.getElementById('formIcon').value;
+            const folder_name = document.getElementById('formFolder').value;
+
+            const table = currentTab === 'tools' ? 'tools' : (currentTab === 'works' ? 'my_works' : 'community_ideas');
+            const action = id ? 'update' : 'add';
+            
+            const data = { name, url, description, icon, folder_name, folder_icon: '📂' };
+            if (id) data.id = id;
+
+            try {
+                const res = await fetch('/api/manage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
+                    body: JSON.stringify({ action, table, data })
+                });
+                const json = await res.json();
+                
+                if (json.success) {
+                    closeFormModal();
+                    loadData();
+                } else {
+                    alert(json.error);
+                }
+            } catch (err) { alert('提交失败'); }
         }
 
         async function handleAction(id, action, table) {
@@ -155,41 +278,6 @@
                 if (json.success) loadData();
                 else alert(json.error);
             } catch (e) { alert('操作失败'); }
-        }
-
-        // --- 新增/编辑弹窗 (极简实现) ---
-        function openEditModal(item = null) {
-            let name = prompt("网站名称", item ? item.name : "");
-            if (name === null) return;
-            let url = prompt("网站URL (https://...)", item ? item.url : "");
-            if (url === null) return;
-            let desc = prompt("一句话简介", item ? item.description : "");
-            if (desc === null) return;
-            let icon = prompt("图标 (填Emoji如🐙，或者图片URL)", item ? item.icon : "🔧");
-            if (icon === null) return;
-            
-            let folder_name = "";
-            if (currentTab === 'tools') {
-                folder_name = prompt("所属文件夹名称", item ? item.folder_name : "常用工具");
-                if (folder_name === null) return;
-            }
-
-            const data = { name, url, description: desc, icon, folder_name };
-            if (item) data.id = item.id;
-            
-            const action = item ? 'update' : 'add';
-            const table = currentTab === 'tools' ? 'tools' : (currentTab === 'works' ? 'my_works' : 'community_ideas');
-
-            fetch('/api/manage', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
-                body: JSON.stringify({ action, table, data })
-            })
-            .then(r => r.json())
-            .then(json => {
-                if (json.success) loadData();
-                else alert(json.error);
-            });
         }
     </script>
 </body>
