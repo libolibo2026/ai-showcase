@@ -1,9 +1,9 @@
 // 获取所有投稿
 export async function onRequestGet({ request, env }) {
-  // 简单的密码保护，你在前端输入的密码必须匹配 'fangtang2024'
-  const url = new URL(request.url);
-  const password = url.searchParams.get('pwd');
-  if (password !== 'fangtang2024') {
+  const pwd = request.headers.get('X-Admin-Password');
+  
+  // 比对 Cloudflare 里的环境变量
+  if (!env.ADMIN_PASSWORD || pwd !== env.ADMIN_PASSWORD) {
     return Response.json({ success: false, error: '密码错误，禁止访问' }, { status: 401 });
   }
 
@@ -18,8 +18,12 @@ export async function onRequestGet({ request, env }) {
 // 更新状态或删除
 export async function onRequestPost({ request, env }) {
   try {
-    const { id, action, pwd } = await request.json();
-    if (pwd !== 'fangtang2024') return Response.json({ success: false, error: '无权限' }, { status: 401 });
+    const pwd = request.headers.get('X-Admin-Password');
+    if (!env.ADMIN_PASSWORD || pwd !== env.ADMIN_PASSWORD) {
+      return Response.json({ success: false, error: '无权限' }, { status: 401 });
+    }
+
+    const { id, action } = await request.json();
 
     if (action === 'approve') {
       await env.DB.prepare("UPDATE community_ideas SET status = 'approved' WHERE id = ?").bind(id).run();
