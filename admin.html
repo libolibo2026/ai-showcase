@@ -3,41 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI橱窗 - 后台管理</title>
+    <title>AI橱窗 - 终极管理后台</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #E9EFEB; color: #1A2B23; font-family: system-ui, sans-serif; }
         .card { background: #FFF; border-radius: 12px; border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .tab-btn { padding: 8px 16px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .tab-btn.active { background: #4C7A64; color: #FFF; }
+        .tab-btn.inactive { background: #FFF; color: #5E7568; border: 1px solid rgba(0,0,0,0.08); }
     </style>
 </head>
 <body class="p-4 sm:p-8">
 
     <!-- 登录区 -->
     <div id="loginSection" class="max-w-md mx-auto mt-20 card p-8 text-center">
-        <h1 class="text-2xl font-bold mb-6">🔐 管理员安全登录</h1>
+        <h1 class="text-2xl font-bold mb-6">🔐 终极管理后台</h1>
         <input type="password" id="pwdInput" placeholder="请输入管理密码" class="w-full px-4 py-3 rounded-lg border mb-4 outline-none focus:border-[#4C7A64]">
         <button onclick="login()" class="w-full bg-[#4C7A64] text-white py-3 rounded-lg font-bold hover:bg-[#3B614F]">进入后台</button>
-        <p class="text-xs text-gray-500 mt-4">密码已加密存储于 Cloudflare 环境变量</p>
     </div>
 
-    <!-- 数据区 -->
-    <div id="adminSection" class="hidden max-w-4xl mx-auto">
+    <!-- 管理区 -->
+    <div id="adminSection" class="hidden max-w-5xl mx-auto">
+        <!-- 顶部导航 -->
         <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold">📋 投稿管理面板</h1>
+            <div class="flex gap-2">
+                <button onclick="switchTab('pending')" id="tab-pending" class="tab-btn active">📥 待审核</button>
+                <button onclick="switchTab('ideas')" id="tab-ideas" class="tab-btn inactive">💡 脑洞管理</button>
+                <button onclick="switchTab('tools')" id="tab-tools" class="tab-btn inactive">📁 常用工具</button>
+                <button onclick="switchTab('works')" id="tab-works" class="tab-btn inactive">🎨 站长作品</button>
+            </div>
             <button onclick="logout()" class="text-sm text-gray-500 hover:text-red-500">退出登录</button>
         </div>
 
-        <div class="space-y-4" id="listContainer">
-            <!-- 数据由 JS 渲染 -->
-        </div>
+        <!-- 数据列表区 -->
+        <div id="listContainer" class="space-y-4"></div>
     </div>
 
     <script>
-        // 从 sessionStorage 获取密码，刷新页面不会丢失，关闭标签页自动销毁
         let adminPwd = sessionStorage.getItem('admin_pwd') || '';
+        let currentTab = 'pending';
 
-        // 如果已有密码，自动尝试登录
-        if (adminPwd) { loadData(); }
+        if (adminPwd) { login(); }
 
         function login() {
             const pwd = document.getElementById('pwdInput').value;
@@ -54,81 +60,136 @@
             document.getElementById('pwdInput').value = '';
         }
 
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('inactive');
+            });
+            document.getElementById('tab-' + tab).classList.remove('inactive');
+            document.getElementById('tab-' + tab).classList.add('active');
+            loadData();
+        }
+
         async function loadData() {
             try {
-                // 将密码放在 Headers 里传给后端
-                const res = await fetch('/api/admin', {
-                    headers: { 'X-Admin-Password': adminPwd }
-                });
+                const headers = { 'X-Admin-Password': adminPwd };
+                let url = '';
+                if (currentTab === 'pending') url = '/api/admin'; // 复用之前的接口，查待审核
+                else if (currentTab === 'tools') url = '/api/tools';
+                else if (currentTab === 'works') url = '/api/works';
+                else if (currentTab === 'ideas') url = '/api/ideas';
+
+                const res = await fetch(url, { headers });
                 const json = await res.json();
                 
-                if (!json.success) {
-                    alert(json.error || '密码错误');
-                    logout();
-                    return;
-                }
-
-                // 登录成功，记住密码
+                if (!json.success) { alert(json.error || '密码错误'); logout(); return; }
+                
                 sessionStorage.setItem('admin_pwd', adminPwd);
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('adminSection').classList.remove('hidden');
 
-                const container = document.getElementById('listContainer');
-                if (json.data.length === 0) {
-                    container.innerHTML = '<div class="text-center text-gray-500 py-10">暂时没有投稿数据</div>';
-                    return;
-                }
-
-                container.innerHTML = json.data.map(item => `
-                    <div class="card p-5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <h3 class="font-bold text-lg truncate">${item.name}</h3>
-                                <span class="text-xs px-2 py-0.5 rounded-full ${item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">
-                                    ${item.status === 'approved' ? '已上墙' : '待审核'}
-                                </span>
-                            </div>
-                            <p class="text-sm text-gray-600 mb-2">${item.description}</p>
-                            <div class="text-xs text-gray-500 flex flex-wrap gap-3">
-                                <span>🔗 <a href="${item.url}" target="_blank" class="text-blue-500 hover:underline">${item.url}</a></span>
-                                ${item.contact ? `<span class="bg-gray-100 px-2 py-1 rounded">📞 ${item.contact}</span>` : ''}
-                            </div>
-                        </div>
-                        <div class="flex gap-2 shrink-0">
-                            ${item.status === 'pending' ? `
-                                <button onclick="action(${item.id}, 'approve')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600">通过</button>
-                            ` : ''}
-                            <button onclick="action(${item.id}, 'delete')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
-                        </div>
-                    </div>
-                `).join('');
-
-            } catch (e) {
-                alert('请求失败，请检查网络');
-            }
+                renderList(json.data);
+            } catch (e) { alert('请求失败'); }
         }
 
-        async function action(id, actionType) {
-            if (actionType === 'delete' && !confirm('确定要永久删除这条投稿吗？')) return;
+        function renderList(data) {
+            const container = document.getElementById('listContainer');
+            
+            // 如果是拉取工具，把嵌套的数组拍平
+            let list = data;
+            if (currentTab === 'tools') {
+                list = [];
+                data.forEach(folder => { list = list.concat(folder.tools || []); });
+            }
+
+            if (!list || list.length === 0) {
+                container.innerHTML = '<div class="text-center text-gray-500 py-10">暂无数据</div>';
+                return;
+            }
+
+            // 对于新增，在顶部放一个按钮
+            let html = '';
+            if (currentTab !== 'pending') {
+                html += `<div class="mb-4 text-right"><button onclick="openEditModal()" class="bg-[#4C7A64] text-white px-4 py-2 rounded-lg text-sm font-bold">+ 新增数据</button></div>`;
+            }
+
+            html += list.map(item => `
+                <div class="card p-5 flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <h3 class="font-bold text-lg">${item.name}</h3>
+                            ${item.status ? `<span class="text-xs px-2 py-0.5 rounded-full ${item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${item.status === 'approved' ? '已上墙' : '待审核'}</span>` : ''}
+                            ${item.folder_name ? `<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${item.folder_name}</span>` : ''}
+                        </div>
+                        <p class="text-sm text-gray-600 mb-2">${item.description}</p>
+                        <div class="text-xs text-gray-500 flex flex-wrap gap-3">
+                            <span>🔗 <a href="${item.url}" target="_blank" class="text-blue-500 hover:underline">${item.url}</a></span>
+                            ${item.contact ? `<span class="bg-gray-100 px-2 py-1 rounded">📞 ${item.contact}</span>` : ''}
+                        </div>
+                    </div>
+                    <div class="flex gap-2 shrink-0 flex-wrap">
+                        ${currentTab === 'pending' ? `
+                            <button onclick="handleAction(${item.id}, 'approve', 'community_ideas')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg">通过</button>
+                            <button onclick="handleAction(${item.id}, 'delete', 'community_ideas')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg">删除</button>
+                        ` : `
+                            <button onclick='openEditModal(${JSON.stringify(item).replace(/'/g, "&#39;")})' class="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg">编辑</button>
+                            <button onclick="handleAction(${item.id}, 'delete', '${currentTab === 'tools' ? 'tools' : 'my_works'}')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg">删除</button>
+                        `}
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+
+        async function handleAction(id, action, table) {
+            if (action === 'delete' && !confirm('确定要永久删除这条数据吗？')) return;
             
             try {
-                const res = await fetch('/api/admin', {
+                const res = await fetch('/api/manage', {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'X-Admin-Password': adminPwd // 同样通过 Headers 传密码
-                    },
-                    body: JSON.stringify({ id, action: actionType })
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
+                    body: JSON.stringify({ action, table, data: { id } })
                 });
                 const json = await res.json();
-                if (json.success) {
-                    loadData(); // 重新加载列表
-                } else {
-                    alert(json.error);
-                }
-            } catch (e) {
-                alert('操作失败');
+                if (json.success) loadData();
+                else alert(json.error);
+            } catch (e) { alert('操作失败'); }
+        }
+
+        // --- 新增/编辑弹窗 (极简实现) ---
+        function openEditModal(item = null) {
+            let name = prompt("网站名称", item ? item.name : "");
+            if (name === null) return;
+            let url = prompt("网站URL (https://...)", item ? item.url : "");
+            if (url === null) return;
+            let desc = prompt("一句话简介", item ? item.description : "");
+            if (desc === null) return;
+            let icon = prompt("图标 (填Emoji如🐙，或者图片URL)", item ? item.icon : "🔧");
+            if (icon === null) return;
+            
+            let folder_name = "";
+            if (currentTab === 'tools') {
+                folder_name = prompt("所属文件夹名称", item ? item.folder_name : "常用工具");
+                if (folder_name === null) return;
             }
+
+            const data = { name, url, description: desc, icon, folder_name };
+            if (item) data.id = item.id;
+            
+            const action = item ? 'update' : 'add';
+            const table = currentTab === 'tools' ? 'tools' : (currentTab === 'works' ? 'my_works' : 'community_ideas');
+
+            fetch('/api/manage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
+                body: JSON.stringify({ action, table, data })
+            })
+            .then(r => r.json())
+            .then(json => {
+                if (json.success) loadData();
+                else alert(json.error);
+            });
         }
     </script>
 </body>
