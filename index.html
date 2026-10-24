@@ -88,7 +88,6 @@
             background-color: var(--text-main);
             color: var(--bg-base); 
             font-weight: 800;
-            transition: all 0.3s ease;
         }
         .search-box {
             background-color: var(--card-bg);
@@ -107,7 +106,6 @@
             border: 1px solid var(--border-color);
             border-radius: 20px;
             box-shadow: 0 4px 20px -10px rgba(0,0,0,0.02);
-            position: relative;
         }
 
         .item-card {
@@ -117,7 +115,7 @@
             transition: all 0.2s ease;
             position: relative;
             display: flex;
-            align-items: center;
+            align-items: flex-start; /* 改为 top 对齐，防止文字换行时左右错位 */
         }
         
         .item-card:hover {
@@ -140,12 +138,10 @@
             flex-shrink: 0;
             width: 3.5rem;
             text-align: left;
+            margin-top: 2px;
         }
         @media (min-width: 640px) {
-            .giant-number {
-                font-size: 3rem;
-                width: 4rem;
-            }
+            .giant-number { font-size: 3rem; width: 4rem; }
         }
         .item-card:hover .giant-number {
             color: var(--num-hover-color);
@@ -192,12 +188,9 @@
             border: 1px solid var(--border-color);
         }
         .theme-btn {
-            width: 32px;
-            height: 28px;
+            width: 32px; height: 28px;
             border-radius: 9px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
             color: var(--text-sub);
             transition: all 0.25s ease;
             cursor: pointer;
@@ -208,48 +201,35 @@
             color: var(--text-main);
             box-shadow: 0 2px 8px rgba(0,0,0,0.08);
         }
-        [data-theme="dark"] .theme-btn.active {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
+        [data-theme="dark"] .theme-btn.active { box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
 
         .tooltip-container { position: relative; }
         .tooltip-text {
-            visibility: hidden;
-            opacity: 0;
-            position: absolute;
-            bottom: 100%;
-            left: 50%;
+            visibility: hidden; opacity: 0;
+            position: absolute; bottom: 100%; left: 50%;
             transform: translateX(-50%) translateY(8px);
             background-color: var(--tooltip-bg);
             color: var(--tooltip-text);
-            text-align: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 500;
-            line-height: 1.4;
-            white-space: normal;
-            width: max-content;
-            max-width: 220px;
+            text-align: center; padding: 8px 12px;
+            border-radius: 8px; font-size: 12px; font-weight: 500;
+            line-height: 1.4; white-space: normal;
+            width: max-content; max-width: 220px;
             z-index: 9999;
             transition: opacity 0.2s ease, transform 0.2s ease;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            pointer-events: none; box-shadow: 0 4px 15px rgba(0,0,0,0.15);
         }
         .tooltip-text::after {
-            content: "";
-            position: absolute;
-            top: 100%;
-            left: 50%;
-            margin-left: -5px;
-            border-width: 5px;
-            border-style: solid;
+            content: ""; position: absolute; top: 100%; left: 50%; margin-left: -5px;
+            border-width: 5px; border-style: solid;
             border-color: var(--tooltip-bg) transparent transparent transparent;
         }
         .tooltip-container:hover .tooltip-text {
-            visibility: visible;
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
+            visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0);
+        }
+
+        /* 新增：图片图标统一样式 */
+        .custom-icon-img {
+            width: 20px; height: 20px; object-fit: contain; border-radius: 4px;
         }
     </style>
 </head>
@@ -261,22 +241,14 @@
                 <div class="w-8 h-8 rounded-lg flex items-center justify-center text-base logo-box">AI</div>
                 <h1 class="text-lg font-bold tracking-tight hidden sm:block">AI橱窗</h1>
             </div>
-            
             <div class="flex items-center gap-3">
                 <div class="theme-switch flex-shrink-0">
-                    <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
-                    </button>
-                    <button onclick="setTheme('dark', this)" class="theme-btn" title="夜晚模式">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-                    </button>
-                    <button onclick="setTheme('eye', this)" class="theme-btn" title="护眼模式">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
-                    </button>
+                    <button onclick="setTheme('light', this)" class="theme-btn active" title="白天模式"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg></button>
+                    <button onclick="setTheme('dark', this)" class="theme-btn" title="夜晚模式"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg></button>
+                    <button onclick="setTheme('eye', this)" class="theme-btn" title="护眼模式"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg></button>
                 </div>
                 <button onclick="openSubmitModal()" class="btn-primary px-4 py-1.5 rounded-lg font-bold text-sm hidden sm:flex items-center gap-1.5">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    提交工具
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg> 提交工具
                 </button>
             </div>
         </div>
@@ -285,64 +257,41 @@
     <section class="max-w-4xl mx-auto px-4 pt-10 pb-6 text-center">
         <div class="relative max-w-2xl mx-auto mb-10">
             <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-            <input type="text" id="searchInput" placeholder="按名称、描述或标签搜索 AI 工具..." class="search-box w-full pl-12 pr-4 py-3.5 rounded-2xl text-base focus:outline-none shadow-sm">
+            <input type="text" id="searchInput" placeholder="按名称、描述或标签搜索..." class="search-box w-full pl-12 pr-4 py-3.5 rounded-2xl text-base focus:outline-none shadow-sm">
         </div>
-
         <div class="flex items-center justify-center gap-8 sm:gap-16">
-            <div class="flex flex-col items-center">
-                <span class="text-3xl font-black" style="color: var(--text-main);" id="statTools">0</span>
-                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">工具总数</span>
-            </div>
+            <div class="flex flex-col items-center"><span class="text-3xl font-black" style="color: var(--text-main);" id="statTools">0</span><span class="text-xs font-medium mt-1" style="color: var(--text-sub);">工具总数</span></div>
             <div class="w-px h-8" style="background: var(--border-color);"></div>
-            <div class="flex flex-col items-center">
-                <span class="text-3xl font-black" style="color: var(--text-main);" id="statWorks">0</span>
-                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">作品总数</span>
-            </div>
+            <div class="flex flex-col items-center"><span class="text-3xl font-black" style="color: var(--text-main);" id="statWorks">0</span><span class="text-xs font-medium mt-1" style="color: var(--text-sub);">作品总数</span></div>
             <div class="w-px h-8" style="background: var(--border-color);"></div>
-            <div class="flex flex-col items-center">
-                <span class="text-3xl font-black" style="color: var(--text-main);" id="statViews">0</span>
-                <span class="text-xs font-medium mt-1" style="color: var(--text-sub);">累计浏览</span>
-            </div>
+            <div class="flex flex-col items-center"><span class="text-3xl font-black" style="color: var(--text-main);" id="statViews">0</span><span class="text-xs font-medium mt-1" style="color: var(--text-sub);">累计浏览</span></div>
         </div>
     </section>
 
     <section id="searchResultsSection" class="hidden max-w-6xl mx-auto w-full px-4 sm:px-6 mb-4">
         <div class="section-card p-5">
             <div class="flex items-center justify-between mb-4 pb-3 border-b" style="border-color: var(--border-color);">
-                <h2 class="text-lg font-bold flex items-center gap-2">
-                    <svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                    搜索结果
-                </h2>
+                <h2 class="text-lg font-bold flex items-center gap-2"><svg class="w-5 h-5" style="color: var(--accent);" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg> 搜索结果</h2>
                 <span class="text-xs font-medium px-2 py-1 rounded-full" style="background: var(--bg-base); color: var(--text-sub);" id="searchResultCount">0 个结果</span>
             </div>
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="searchResultsGrid">
-                <!-- JS 渲染 -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" id="searchResultsGrid"></div>
         </div>
     </section>
 
     <main id="mainContent" class="flex-grow max-w-6xl mx-auto w-full px-4 sm:px-6 py-2 space-y-5">
-        
         <section class="section-card p-5 sm:p-6">
             <div class="flex flex-col md:flex-row gap-6 items-center">
                 <div class="w-full md:w-5/12 flex flex-col justify-center">
                     <span class="text-[11px] font-bold tracking-wider uppercase mb-2" style="color: var(--accent);">站长作品</span>
                     <h2 class="text-2xl sm:text-3xl font-extrabold mb-3 leading-tight tracking-tight">我的 AI 独立实验室</h2>
-                    <p class="text-xs leading-relaxed mb-5" style="color: var(--text-sub);">
-                        纯手工打造，专为寻找好工具的你。收录免注册神器，也是大家展示创意的角落。
-                    </p>
+                    <p class="text-xs leading-relaxed mb-5" style="color: var(--text-sub);">纯手工打造，专为寻找好工具的你。收录免注册神器，也是大家展示创意的角落。</p>
                     <div class="flex gap-2">
-                        <a href="https://mindfeed2.pages.dev/" target="_blank" class="btn-primary px-5 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1">
-                            访问主站 <span class="text-sm leading-none">↗</span>
-                        </a>
-                        <button onclick="openSubmitModal()" class="btn-secondary px-5 py-2 rounded-lg font-bold text-xs">
-                            提交作品
-                        </button>
+                        <a href="https://mindfeed2.pages.dev/" target="_blank" class="btn-primary px-5 py-2 rounded-lg font-bold text-xs flex items-center justify-center gap-1">访问主站 <span class="text-sm leading-none">↗</span></a>
+                        <button onclick="openSubmitModal()" class="btn-secondary px-5 py-2 rounded-lg font-bold text-xs">提交作品</button>
                     </div>
                 </div>
-                
                 <div class="w-full md:w-7/12">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="myWorksGrid">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="myWorksGrid">
                         <div class="text-center py-6 opacity-50 text-xs w-full col-span-full">加载数据中...</div>
                     </div>
                     <div class="mt-4 flex items-center justify-center gap-2">
@@ -360,12 +309,9 @@
                         <h2 class="text-base font-bold">AI 脑洞橱窗</h2>
                         <p class="text-[11px] mt-0.5" style="color: var(--text-sub);">网友用 AI 搞出的创意</p>
                     </div>
-                    <div class="space-y-1 flex-grow" id="showcaseGrid">
-                        <!-- JS 渲染 -->
-                    </div>
+                    <div class="space-y-2 flex-grow" id="showcaseGrid"></div>
                 </section>
             </div>
-
             <div class="md:col-span-7">
                 <section class="section-card p-4 h-full">
                     <div class="mb-3 flex justify-between items-end">
@@ -374,23 +320,16 @@
                             <p class="text-[11px] mt-0.5" style="color: var(--text-sub);">点击直达，悬停查看简介</p>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="toolsGrid">
-                        <!-- JS 渲染 -->
-                    </div>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2.5" id="toolsGrid"></div>
                 </section>
             </div>
         </div>
     </main>
 
-    <!-- 极简页脚 (带管理员入口) -->
     <footer class="w-full max-w-6xl mx-auto px-4 py-5 mt-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <p class="text-[11px] font-medium opacity-40">
-            &copy; <span id="currentYear">2026</span> 方塘 Mindfeed. 保留所有权利。
-        </p>
-        <!-- 低调的管理员入口 -->
+        <p class="text-[11px] font-medium opacity-40">&copy; <span id="currentYear"></span> 方塘 Mindfeed. 保留所有权利。</p>
         <a href="/admin.html" class="text-[11px] font-medium opacity-30 hover:opacity-100 transition-opacity flex items-center gap-1" title="管理员入口">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-            管理
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg> 管理
         </a>
     </footer>
 
@@ -400,7 +339,6 @@
         </button>
     </div>
 
-    <!-- 提交弹窗 -->
     <div id="submitModal" class="fixed inset-0 bg-black/40 hidden items-center justify-center z-[100] p-4 backdrop-blur-sm">
         <div class="rounded-2xl w-full max-w-md overflow-hidden shadow-2xl border" style="background: var(--card-bg); border-color: var(--border-color);">
             <div class="px-5 py-4 border-b flex justify-between items-center" style="border-color: var(--border-color);">
@@ -408,23 +346,10 @@
                 <button onclick="closeSubmitModal()" class="text-xl leading-none opacity-50 hover:opacity-100 transition-opacity">&times;</button>
             </div>
             <form onsubmit="handleSubmit(event)" class="p-5 space-y-3">
-                <div>
-                    <label class="block text-xs font-bold mb-1.5">网站名称</label>
-                    <input type="text" required class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="给你的网站起个名字">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1.5">网站地址 (URL)</label>
-                    <input type="url" required class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="https://...">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold mb-1.5">一句话简介</label>
-                    <textarea required rows="2" class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="用一句话介绍它的特色..."></textarea>
-                </div>
-                <!-- 联系方式 -->
-                <div>
-                    <label class="block text-xs font-bold mb-1.5">联系方式 (选填)</label>
-                    <input type="text" name="contact" class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="微信/邮箱，方便站长联系你">
-                </div>
+                <div><label class="block text-xs font-bold mb-1.5">网站名称</label><input type="text" required class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="给你的网站起个名字"></div>
+                <div><label class="block text-xs font-bold mb-1.5">网站地址 (URL)</label><input type="url" required class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="https://..."></div>
+                <div><label class="block text-xs font-bold mb-1.5">一句话简介</label><textarea required rows="2" class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="用一句话介绍它的特色..."></textarea></div>
+                <div><label class="block text-xs font-bold mb-1.5">联系方式 (选填)</label><input type="text" name="contact" class="w-full px-3 py-2 rounded-lg text-sm border focus:outline-none" style="background: var(--bg-base); border-color: var(--border-color); color: var(--text-main);" placeholder="微信/邮箱，方便站长联系你"></div>
                 <button type="submit" class="btn-primary w-full py-2.5 rounded-lg font-bold text-sm mt-1">确认提交</button>
             </form>
         </div>
@@ -432,7 +357,6 @@
 
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
-
         const globalData = { works: [], ideas: [], tools: [] };
 
         function setTheme(theme, btn) {
@@ -441,7 +365,6 @@
             btn.classList.add('active');
             localStorage.setItem('ai-showcase-theme', theme);
         }
-        
         const savedTheme = localStorage.getItem('ai-showcase-theme') || 'light';
         document.documentElement.setAttribute('data-theme', savedTheme);
         setTimeout(() => {
@@ -451,20 +374,15 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
-        function getFavicon(url, fallbackIcon) {
-            try {
-                let domain = new URL(url).hostname;
-                let faviconUrl = `https://icons.duckduckgo.com/ip3/${domain}.ico`;
-                return `
-                    <div class="w-6 h-6 flex items-center justify-center flex-shrink-0">
-                        <img src="${faviconUrl}" alt="logo" class="w-5 h-5 object-contain rounded-sm" 
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <span style="display:none;" class="text-base">${fallbackIcon}</span>
-                    </div>
-                `;
-            } catch (e) {
-                return `<div class="w-6 h-6 flex items-center justify-center flex-shrink-0 text-base">${fallbackIcon}</div>`;
+        // 【核心改动】: 判断 icon 是 URL 还是 Emoji
+        function renderIcon(iconStr) {
+            if (!iconStr) return '<span class="text-base">🔧</span>';
+            if (iconStr.startsWith('http://') || iconStr.startsWith('https://')) {
+                // 如果是链接，渲染图片
+                return `<img src="${iconStr}" class="custom-icon-img" onerror="this.outerHTML='<span class=\\'text-base\\'>🔧</span>'">`;
             }
+            // 否则渲染 Emoji
+            return `<span class="text-base">${iconStr}</span>`;
         }
 
         async function fetchStats() {
@@ -473,7 +391,6 @@
                 const json = await res.json();
                 if (!json.success) return;
                 const { tools, works, ideas, totalViews } = json.data;
-                
                 animateValue('statTools', 0, tools, 1000);
                 animateValue('statWorks', 0, works + ideas, 1000);
                 animateValue('statViews', 0, totalViews, 1000);
@@ -488,52 +405,35 @@
                 if (!startTimestamp) startTimestamp = timestamp;
                 const progress = Math.min((timestamp - startTimestamp) / duration, 1);
                 obj.innerHTML = Math.floor(progress * (end - start) + start);
-                if (progress < 1) {
-                    window.requestAnimationFrame(step);
-                } else {
-                    obj.innerHTML = end;
-                }
+                if (progress < 1) window.requestAnimationFrame(step);
+                else obj.innerHTML = end;
             };
             window.requestAnimationFrame(step);
         }
 
         async function trackHit(id, type) {
-            try {
-                await fetch('/api/hit', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ id, type })
-                });
-            } catch (e) { console.error('统计失败'); }
+            try { await fetch('/api/hit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, type }) }); } catch (e) {}
         }
-
-        function handleOpen(url, id, type) {
-            if (id) trackHit(id, type);
-            window.open(url, '_blank');
-        }
+        function handleOpen(url, id, type) { if (id) trackHit(id, type); window.open(url, '_blank'); }
 
         function renderWorks(data) {
             const grid = document.getElementById('myWorksGrid');
-            if (!data || data.length === 0) {
-                grid.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无作品</div>`;
-                return;
-            }
+            if (!data || data.length === 0) { grid.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无作品</div>`; return; }
             grid.innerHTML = data.map((item, index) => {
                 const numStr = (index + 1).toString().padStart(2, '0');
                 const views = item.views || 0;
-                const logoHtml = getFavicon(item.url, item.icon);
                 return `
                 <div class="item-card p-3 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'works')">
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-start gap-3 w-full">
                         <div class="giant-number">${numStr}</div>
                         <div class="flex-1 min-w-0">
-                            <div class="flex items-center justify-between mb-0.5">
-                                <h3 class="text-sm font-bold truncate flex items-center gap-2">
-                                    ${logoHtml} ${item.name}
+                            <div class="flex items-center justify-between mb-1">
+                                <h3 class="text-sm font-bold flex items-center gap-2">
+                                    ${renderIcon(item.icon)} ${item.name}
                                 </h3>
-                                <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
+                                <span class="text-[10px] font-medium opacity-40 whitespace-nowrap">${views} 浏览</span>
                             </div>
-                            <p class="text-xs truncate" style="color: var(--text-sub);">${item.description}</p>
+                            <p class="text-xs leading-relaxed" style="color: var(--text-sub);">${item.description}</p>
                         </div>
                     </div>
                 </div>`;
@@ -547,20 +447,19 @@
                 html = data.map((item, index) => {
                     const views = item.views || 0;
                     const numStr = (index + 1).toString().padStart(2, '0');
-                    const logoHtml = getFavicon(item.url, item.icon);
                     return `
                     <div class="item-card p-2.5 cursor-pointer" onclick="handleOpen('${item.url}', ${item.id}, 'ideas')">
-                        <div class="flex items-center gap-3">
-                            <div class="giant-number" style="font-size: 2.2rem; width: 3rem;">${numStr}</div>
+                        <div class="flex items-start gap-3 w-full">
+                            <div class="giant-number" style="font-size: 2.2rem; width: 3rem; margin-top: 0;">${numStr}</div>
                             <div class="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style="background: var(--bg-base);">
-                                ${logoHtml}
+                                ${renderIcon(item.icon)}
                             </div>
                             <div class="flex-1 min-w-0 flex flex-col justify-center">
                                 <div class="flex items-center justify-between">
-                                    <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                    <h3 class="text-sm font-bold">${item.name}</h3>
                                     <span class="text-[10px] font-medium opacity-40">${views} 浏览</span>
                                 </div>
-                                <p class="text-[11px] mt-0.5 line-clamp-2" style="color: var(--text-sub);">${item.description}</p>
+                                <p class="text-[11px] mt-1 leading-relaxed" style="color: var(--text-sub);">${item.description}</p>
                             </div>
                         </div>
                     </div>
@@ -568,7 +467,6 @@
             } else {
                 html = `<div class="text-center py-4 opacity-50 text-xs w-full">暂无脑洞</div>`;
             }
-            
             html += `
                 <div class="mt-2 p-3 rounded-xl border border-dashed flex flex-col items-center justify-center cursor-pointer transition-all hover:bg-black/5 dark:hover:bg-white/5" 
                      style="border-color: var(--border-color);" onclick="openSubmitModal()">
@@ -583,22 +481,18 @@
 
         function renderTools(data) {
             const container = document.getElementById('toolsGrid');
-            if (!data || data.length === 0) {
-                container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无工具</div>`;
-                return;
-            }
-            container.innerHTML = data.map(tool => {
-                const logoHtml = getFavicon(tool.url, tool.icon);
-                return `
-                <div class="item-card tooltip-container p-2.5 flex flex-col justify-center cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
-                    <div class="flex items-center gap-2 mb-1">
-                        ${logoHtml}
-                        <div class="text-xs font-bold truncate">${tool.name}</div>
+            if (!data || data.length === 0) { container.innerHTML = `<div class="text-center py-6 opacity-50 text-xs w-full col-span-full">暂无工具</div>`; return; }
+            container.innerHTML = data.map(tool => `
+                <div class="item-card tooltip-container p-2.5 flex flex-col justify-start cursor-pointer relative" onclick="window.open('${tool.url}', '_blank')">
+                    <div class="flex items-center gap-2 mb-1.5">
+                        ${renderIcon(tool.icon)}
+                        <div class="text-xs font-bold">${tool.name}</div>
                     </div>
-                    <div class="text-[10px] truncate" style="color: var(--text-sub);">${tool.description}</div>
+                    <!-- 取消 truncate，自然换行 -->
+                    <div class="text-[11px] leading-snug" style="color: var(--text-sub);">${tool.description}</div>
                     <div class="tooltip-text">${tool.description}</div>
                 </div>
-            `}).join('');
+            `).join('');
         }
 
         async function fetchData() {
@@ -608,24 +502,15 @@
                     fetch('/api/ideas').then(r => r.json()),
                     fetch('/api/tools').then(r => r.json())
                 ]);
-
                 if (worksRes.success) globalData.works = worksRes.data || [];
                 if (ideasRes.success) globalData.ideas = ideasRes.data || [];
                 if (toolsRes.success) {
                     let allTools = [];
-                    (toolsRes.data || []).forEach(folder => {
-                        allTools = allTools.concat(folder.tools || []);
-                    });
+                    (toolsRes.data || []).forEach(folder => { allTools = allTools.concat(folder.tools || []); });
                     globalData.tools = allTools;
                 }
-
-                renderWorks(globalData.works);
-                renderIdeas(globalData.ideas);
-                renderTools(globalData.tools);
-
-            } catch (e) {
-                console.error("加载数据失败", e);
-            }
+                renderWorks(globalData.works); renderIdeas(globalData.ideas); renderTools(globalData.tools);
+            } catch (e) { console.error("加载数据失败", e); }
         }
 
         document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -636,68 +521,38 @@
             const countLabel = document.getElementById('searchResultCount');
 
             if (keyword === '') {
-                mainContent.classList.remove('hidden');
-                searchSection.classList.add('hidden');
-                return;
+                mainContent.classList.remove('hidden'); searchSection.classList.add('hidden'); return;
             }
-
-            mainContent.classList.add('hidden');
-            searchSection.classList.remove('hidden');
+            mainContent.classList.add('hidden'); searchSection.classList.remove('hidden');
 
             let results = [];
-
-            globalData.works.forEach(item => {
-                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
-                    results.push({ ...item, type: 'work', typeLabel: '站长作品' });
-                }
-            });
-
-            globalData.ideas.forEach(item => {
-                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
-                    results.push({ ...item, type: 'idea', typeLabel: 'AI脑洞' });
-                }
-            });
-
-            globalData.tools.forEach(item => {
-                if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) {
-                    results.push({ ...item, type: 'tool', typeLabel: '常用工具' });
-                }
-            });
+            globalData.works.forEach(item => { if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) results.push({ ...item, type: 'work', typeLabel: '站长作品' }); });
+            globalData.ideas.forEach(item => { if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) results.push({ ...item, type: 'idea', typeLabel: 'AI脑洞' }); });
+            globalData.tools.forEach(item => { if (item.name.toLowerCase().includes(keyword) || item.description.toLowerCase().includes(keyword)) results.push({ ...item, type: 'tool', typeLabel: '常用工具' }); });
 
             countLabel.textContent = `${results.length} 个结果`;
-
             if (results.length === 0) {
                 resultsGrid.innerHTML = `<div class="text-center py-10 text-sm opacity-50 col-span-full">没找到与 “${keyword}” 相关的内容</div>`;
             } else {
-                resultsGrid.innerHTML = results.map(item => {
-                    const logoHtml = getFavicon(item.url, item.icon);
-                    return `
-                    <div class="item-card p-3 cursor-pointer border border-transparent hover:border-[color:var(--accent)]" 
-                         onclick="handleOpen('${item.url}', ${item.id}, '${item.type}')">
-                        <div class="flex items-center gap-3">
-                            ${logoHtml}
+                resultsGrid.innerHTML = results.map(item => `
+                    <div class="item-card p-3 cursor-pointer border border-transparent hover:border-[color:var(--accent)]" onclick="handleOpen('${item.url}', ${item.id}, '${item.type}')">
+                        <div class="flex items-start gap-3">
+                            ${renderIcon(item.icon)}
                             <div class="flex-1 min-w-0">
-                                <div class="flex items-center gap-2 mb-0.5">
-                                    <h3 class="text-sm font-bold truncate">${item.name}</h3>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="text-sm font-bold">${item.name}</h3>
                                     <span class="text-[9px] px-1.5 py-0.5 rounded-sm bg-black/5 dark:bg-white/10 opacity-70 whitespace-nowrap">${item.typeLabel}</span>
                                 </div>
-                                <p class="text-xs truncate" style="color: var(--text-sub);">${item.description}</p>
+                                <p class="text-xs leading-relaxed" style="color: var(--text-sub);">${item.description}</p>
                             </div>
                         </div>
                     </div>
-                    `;
-                }).join('');
+                `).join('');
             }
         });
 
-        function openSubmitModal() {
-            document.getElementById('submitModal').classList.remove('hidden');
-            document.getElementById('submitModal').classList.add('flex');
-        }
-        function closeSubmitModal() {
-            document.getElementById('submitModal').classList.add('hidden');
-            document.getElementById('submitModal').classList.remove('flex');
-        }
+        function openSubmitModal() { document.getElementById('submitModal').classList.remove('hidden'); document.getElementById('submitModal').classList.add('flex'); }
+        function closeSubmitModal() { document.getElementById('submitModal').classList.add('hidden'); document.getElementById('submitModal').classList.remove('flex'); }
 
         async function handleSubmit(e) {
             e.preventDefault();
@@ -707,26 +562,13 @@
             const desc = form.querySelector('textarea').value;
             const contact = form.querySelector('input[name="contact"]').value;
 
-            const res = await fetch('/api/submit', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, url, desc, contact })
-            });
+            const res = await fetch('/api/submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, url, desc, contact }) });
             const json = await res.json();
-
-            if (json.success) {
-                alert('提交成功！等待站长审核后将展示在橱窗中。');
-                form.reset();
-                closeSubmitModal();
-            } else {
-                alert('提交失败：' + (json.error || '请稍后重试'));
-            }
+            if (json.success) { alert('提交成功！等待站长审核后将展示在橱窗中。'); form.reset(); closeSubmitModal(); } 
+            else { alert('提交失败：' + (json.error || '请稍后重试')); }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            fetchStats();
-            fetchData(); 
-        });
+        document.addEventListener('DOMContentLoaded', () => { fetchStats(); fetchData(); });
     </script>
 </body>
 </html>
