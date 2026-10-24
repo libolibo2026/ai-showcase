@@ -3,7 +3,6 @@ export async function onRequestPost({ request, env }) {
     const { name, url, desc, contact } = await request.json();
     if (!name || !url) return Response.json({ success: false, error: '名称和链接不能为空' }, { status: 400 });
     
-    // 将 contact 插入数据库
     await env.DB.prepare("INSERT INTO community_ideas (name, description, url, contact, status) VALUES (?, ?, ?, ?, 'pending')")
       .bind(name, desc || '暂无简介', url, contact || '').run();
       
