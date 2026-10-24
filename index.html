@@ -115,7 +115,7 @@
             transition: all 0.2s ease;
             position: relative;
             display: flex;
-            align-items: flex-start; /* 改为 top 对齐，防止文字换行时左右错位 */
+            align-items: flex-start;
         }
         
         .item-card:hover {
@@ -227,7 +227,6 @@
             visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0);
         }
 
-        /* 新增：图片图标统一样式 */
         .custom-icon-img {
             width: 20px; height: 20px; object-fit: contain; border-radius: 4px;
         }
@@ -374,14 +373,11 @@
             if (savedTheme === 'eye') btns[2]?.classList.add('active');
         }, 50);
 
-        // 【核心改动】: 判断 icon 是 URL 还是 Emoji
         function renderIcon(iconStr) {
             if (!iconStr) return '<span class="text-base">🔧</span>';
             if (iconStr.startsWith('http://') || iconStr.startsWith('https://')) {
-                // 如果是链接，渲染图片
                 return `<img src="${iconStr}" class="custom-icon-img" onerror="this.outerHTML='<span class=\\'text-base\\'>🔧</span>'">`;
             }
-            // 否则渲染 Emoji
             return `<span class="text-base">${iconStr}</span>`;
         }
 
@@ -488,7 +484,6 @@
                         ${renderIcon(tool.icon)}
                         <div class="text-xs font-bold">${tool.name}</div>
                     </div>
-                    <!-- 取消 truncate，自然换行 -->
                     <div class="text-[11px] leading-snug" style="color: var(--text-sub);">${tool.description}</div>
                     <div class="tooltip-text">${tool.description}</div>
                 </div>
@@ -502,7 +497,12 @@
                     fetch('/api/ideas').then(r => r.json()),
                     fetch('/api/tools').then(r => r.json())
                 ]);
-                if (worksRes.success) globalData.works = worksRes.data || [];
+                if (worksRes.success) {
+                    // 拍平站长作品
+                    let flatWorks = [];
+                    (worksRes.data || []).forEach(folder => { flatWorks = flatWorks.concat(folder.tools || []); });
+                    globalData.works = flatWorks;
+                }
                 if (ideasRes.success) globalData.ideas = ideasRes.data || [];
                 if (toolsRes.success) {
                     let allTools = [];
