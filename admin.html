@@ -12,6 +12,14 @@
         .tab-btn.active { background: #4C7A64; color: #FFF; }
         .tab-btn.inactive { background: #FFF; color: #5E7568; border: 1px solid rgba(0,0,0,0.08); }
         
+        /* 夜间模式适配（既然你截图是暗黑模式，后台我也加个简单的暗黑适配） */
+        @media (prefers-color-scheme: dark) {
+            body { background-color: #0A100D; color: #B8D4C6; }
+            .card { background: #131F19; border-color: rgba(184, 212, 198, 0.1); }
+            .tab-btn.inactive { background: #131F19; color: #769985; border-color: rgba(184, 212, 198, 0.1); }
+            .text-gray-600 { color: #9ca3af !important; }
+        }
+
         .modal-mask { background: rgba(0,0,0,0.4); backdrop-filter: blur(4px); }
         .modal-content { animation: slideUp 0.3s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -22,7 +30,7 @@
     <!-- 登录区 -->
     <div id="loginSection" class="max-w-md mx-auto mt-20 card p-8 text-center">
         <h1 class="text-2xl font-bold mb-6">🔐 终极管理后台</h1>
-        <input type="password" id="pwdInput" placeholder="请输入管理密码" class="w-full px-4 py-3 rounded-lg border mb-4 outline-none focus:border-[#4C7A64]">
+        <input type="password" id="pwdInput" placeholder="请输入管理密码" class="w-full px-4 py-3 rounded-lg border mb-4 outline-none focus:border-[#4C7A64] bg-transparent border-gray-300 dark:border-gray-700 text-current">
         <button onclick="login()" class="w-full bg-[#4C7A64] text-white py-3 rounded-lg font-bold hover:bg-[#3B614F]">进入后台</button>
     </div>
 
@@ -58,28 +66,28 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2" id="folderWrapper">
                         <label class="block text-xs font-bold mb-1.5">所属分类名称</label>
-                        <input type="text" id="formFolder" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="例如：常用工具 / 站长精选">
+                        <input type="text" id="formFolder" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none bg-transparent border-gray-300 dark:border-gray-700 text-current" placeholder="例如：常用工具 / 站长精选">
                     </div>
                     <div>
                         <label class="block text-xs font-bold mb-1.5">网站名称</label>
-                        <input type="text" id="formName" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="名称">
+                        <input type="text" id="formName" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none bg-transparent border-gray-300 dark:border-gray-700 text-current" placeholder="名称">
                     </div>
                     <div>
                         <label class="block text-xs font-bold mb-1.5">网站图标</label>
-                        <input type="text" id="formIcon" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="填 Emoji 或 图片URL">
+                        <input type="text" id="formIcon" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none bg-transparent border-gray-300 dark:border-gray-700 text-current" placeholder="填 Emoji 或 图片URL">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-bold mb-1.5">网站链接 (URL)</label>
-                        <input type="url" id="formUrl" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="https://...">
+                        <input type="url" id="formUrl" required class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none bg-transparent border-gray-300 dark:border-gray-700 text-current" placeholder="https://...">
                     </div>
                     <div class="col-span-2">
                         <label class="block text-xs font-bold mb-1.5">简介描述</label>
-                        <textarea id="formDesc" required rows="3" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none focus:border-[#4C7A64]" placeholder="一句话介绍它的特色..."></textarea>
+                        <textarea id="formDesc" required rows="3" class="w-full px-3 py-2.5 rounded-lg border text-sm focus:outline-none bg-transparent border-gray-300 dark:border-gray-700 text-current" placeholder="一句话介绍它的特色..."></textarea>
                     </div>
                 </div>
                 
                 <div class="pt-4 flex gap-3">
-                    <button type="button" onclick="closeFormModal()" class="flex-1 py-2.5 rounded-lg border font-bold text-gray-600 hover:bg-gray-50">取消</button>
+                    <button type="button" onclick="closeFormModal()" class="flex-1 py-2.5 rounded-lg border font-bold text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800">取消</button>
                     <button type="submit" class="flex-1 py-2.5 rounded-lg bg-[#4C7A64] text-white font-bold hover:bg-[#3B614F]">保存提交</button>
                 </div>
             </form>
@@ -89,7 +97,7 @@
     <script>
         let adminPwd = sessionStorage.getItem('admin_pwd') || '';
         let currentTab = 'pending';
-        let currentList = [];
+        let currentList = []; 
 
         if (adminPwd) { login(); }
 
@@ -128,10 +136,9 @@
             try {
                 const headers = { 'X-Admin-Password': adminPwd };
                 let url = '';
-                if (currentTab === 'pending') url = '/api/admin';
+                if (currentTab === 'pending' || currentTab === 'ideas') url = '/api/admin';
                 else if (currentTab === 'tools') url = '/api/tools';
                 else if (currentTab === 'works') url = '/api/works';
-                else if (currentTab === 'ideas') url = '/api/ideas';
 
                 const res = await fetch(url, { headers });
                 const json = await res.json();
@@ -142,10 +149,17 @@
                 document.getElementById('loginSection').classList.add('hidden');
                 document.getElementById('adminSection').classList.remove('hidden');
 
-                let list = json.data;
+                let list = json.data || [];
+                
+                // 关键修复：如果是待审核面板，只显示 pending 的数据
+                if (currentTab === 'pending') {
+                    list = list.filter(item => item.status === 'pending');
+                }
+
+                // 拍平工具和作品数据
                 if (currentTab === 'tools' || currentTab === 'works') {
                     let flatList = [];
-                    json.data.forEach(folder => { 
+                    list.forEach(folder => { 
                         (folder.tools || []).forEach(tool => {
                             tool.folder_name = folder.category; 
                             flatList.push(tool); 
@@ -153,9 +167,10 @@
                     });
                     list = flatList;
                 }
+                
                 currentList = list;
                 renderList(list);
-            } catch (e) { alert('请求失败'); }
+            } catch (e) { alert('请求失败，请检查网络'); }
         }
 
         function renderList(list) {
@@ -172,25 +187,63 @@
                         <div class="flex items-center gap-2 mb-1">
                             <h3 class="font-bold text-lg">${item.name}</h3>
                             ${item.status ? `<span class="text-xs px-2 py-0.5 rounded-full ${item.status === 'approved' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}">${item.status === 'approved' ? '已上墙' : '待审核'}</span>` : ''}
-                            ${item.folder_name ? `<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">${item.folder_name}</span>` : ''}
+                            ${item.folder_name ? `<span class="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300">${item.folder_name}</span>` : ''}
                         </div>
                         <p class="text-sm text-gray-600 mb-2 leading-relaxed">${item.description}</p>
                         <div class="text-xs text-gray-500 flex flex-wrap gap-3">
                             <span>🔗 <a href="${item.url}" target="_blank" class="text-blue-500 hover:underline">${item.url}</a></span>
-                            ${item.contact ? `<span class="bg-gray-100 px-2 py-1 rounded">📞 ${item.contact}</span>` : ''}
+                            ${item.contact ? `<span class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">📞 ${item.contact}</span>` : ''}
                         </div>
                     </div>
                     <div class="flex gap-2 shrink-0 flex-wrap">
-                        ${currentTab === 'pending' ? `
-                            <button onclick="handleAction(${item.id}, 'approve', 'community_ideas')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600">通过</button>
-                            <button onclick="handleAction(${item.id}, 'delete', 'community_ideas')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
+                        ${currentTab === 'pending' || (currentTab === 'ideas' && item.status === 'pending') ? `
+                            <button onclick="handleAdminAction(${item.id}, 'approve')" class="px-4 py-2 bg-green-500 text-white text-sm rounded-lg hover:bg-green-600 transition-colors">通过</button>
+                            <button onclick="handleAdminAction(${item.id}, 'delete')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200 transition-colors">删除</button>
+                        ` : currentTab === 'ideas' ? `
+                            <button onclick="handleAdminAction(${item.id}, 'delete')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
                         ` : `
-                            <button onclick="openFormModal(${item.id})" class="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100">编辑</button>
-                            <button onclick="handleAction(${item.id}, 'delete', '${currentTab === 'tools' ? 'tools' : 'my_works'}')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
+                            <button onclick="openFormModal(${item.id})" class="px-4 py-2 bg-blue-50 text-blue-600 text-sm rounded-lg hover:bg-blue-100 dark:bg-blue-900/30 dark:text-blue-300">编辑</button>
+                            <button onclick="handleManageAction(${item.id}, 'delete')" class="px-4 py-2 bg-red-100 text-red-600 text-sm rounded-lg hover:bg-red-200">删除</button>
                         `}
                     </div>
                 </div>
             `).join('');
+        }
+
+        // 【修复核心】：专门处理投稿表（审核、删除）
+        async function handleAdminAction(id, action) {
+            if (action === 'delete' && !confirm('确定要永久删除这条投稿吗？')) return;
+            
+            try {
+                const res = await fetch('/api/admin', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
+                    body: JSON.stringify({ id, action })
+                });
+                const json = await res.json();
+                if (json.success) {
+                    loadData(); // 操作成功，重新拉取数据（已通过的会自动消失）
+                } else {
+                    alert(json.error);
+                }
+            } catch (e) { alert('网络请求失败'); }
+        }
+
+        // 处理工具表/作品表（修改、删除）
+        async function handleManageAction(id, action) {
+            if (action === 'delete' && !confirm('确定要永久删除这条数据吗？')) return;
+            const table = currentTab === 'tools' ? 'tools' : 'my_works';
+            
+            try {
+                const res = await fetch('/api/manage', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
+                    body: JSON.stringify({ action, table, data: { id } })
+                });
+                const json = await res.json();
+                if (json.success) loadData();
+                else alert(json.error);
+            } catch (e) { alert('操作失败'); }
         }
 
         function openFormModal(id = null) {
@@ -200,11 +253,8 @@
             const title = document.getElementById('modalTitle');
             const folderWrapper = document.getElementById('folderWrapper');
             
-            if (currentTab === 'ideas') {
-                folderWrapper.style.display = 'none';
-            } else {
-                folderWrapper.style.display = 'block';
-            }
+            if (currentTab === 'ideas') { folderWrapper.style.display = 'none'; } 
+            else { folderWrapper.style.display = 'block'; }
 
             if (id) {
                 title.textContent = '编辑数据';
@@ -248,8 +298,12 @@
             const data = { name, url, description, icon, folder_name, folder_icon: '📂' };
             if (id) data.id = id;
 
+            // 如果是在脑洞管理里加，走 admin 接口；其他走 manage 接口
+            let endpoint = '/api/manage';
+            if (table === 'community_ideas') endpoint = '/api/admin';
+
             try {
-                const res = await fetch('/api/manage', {
+                const res = await fetch(endpoint, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
                     body: JSON.stringify({ action, table, data })
@@ -263,21 +317,6 @@
                     alert(json.error);
                 }
             } catch (err) { alert('提交失败'); }
-        }
-
-        async function handleAction(id, action, table) {
-            if (action === 'delete' && !confirm('确定要永久删除这条数据吗？')) return;
-            
-            try {
-                const res = await fetch('/api/manage', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'X-Admin-Password': adminPwd },
-                    body: JSON.stringify({ action, table, data: { id } })
-                });
-                const json = await res.json();
-                if (json.success) loadData();
-                else alert(json.error);
-            } catch (e) { alert('操作失败'); }
         }
     </script>
 </body>
