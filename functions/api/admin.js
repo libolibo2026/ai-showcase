@@ -1,10 +1,8 @@
-// 获取所有投稿
+// 获取所有投稿（查全部，交由前端分类显示）
 export async function onRequestGet({ request, env }) {
   const pwd = request.headers.get('X-Admin-Password');
-  
-  // 比对 Cloudflare 里的环境变量
   if (!env.ADMIN_PASSWORD || pwd !== env.ADMIN_PASSWORD) {
-    return Response.json({ success: false, error: '密码错误，禁止访问' }, { status: 401 });
+    return Response.json({ success: false, error: '密码错误' }, { status: 401 });
   }
 
   try {
@@ -15,7 +13,7 @@ export async function onRequestGet({ request, env }) {
   }
 }
 
-// 更新状态或删除
+// 处理通过或删除操作（专门针对投稿表）
 export async function onRequestPost({ request, env }) {
   try {
     const pwd = request.headers.get('X-Admin-Password');
