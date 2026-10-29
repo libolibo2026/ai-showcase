@@ -234,6 +234,7 @@
 </head>
 <body class="pb-20">
 
+    <!-- 页面内容 -->
     <header class="sticky top-0 z-50 glass-nav">
         <div class="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
             <div class="flex items-center gap-3 flex-shrink-0">
@@ -355,6 +356,49 @@
     </div>
 
     <script>
+        // ==========================================
+        // 🛡️ 网页基础保护策略 (防右键、防F12)
+        // ==========================================
+        // 1. 屏蔽鼠标右键菜单
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+
+        // 2. 拦截键盘快捷键 (F12, Ctrl+Shift+I/J/C, Ctrl+U, Ctrl+S)
+        document.addEventListener('keydown', function(e) {
+            // F12
+            if (e.key === 'F12' || e.keyCode === 123) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+I (开发者工具)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.keyCode === 73)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+J (控制台)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j' || e.keyCode === 74)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+Shift+C (检查元素)
+            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c' || e.keyCode === 67)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+U (查看源代码)
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u' || e.keyCode === 85)) {
+                e.preventDefault();
+                return false;
+            }
+            // Ctrl+S (保存网页)
+            if (e.ctrlKey && (e.key === 'S' || e.key === 's' || e.keyCode === 83)) {
+                e.preventDefault();
+                return false;
+            }
+        });
+        // ==========================================
+
         document.getElementById('currentYear').textContent = new Date().getFullYear();
         const globalData = { works: [], ideas: [], tools: [] };
 
